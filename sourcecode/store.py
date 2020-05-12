@@ -7,7 +7,7 @@ class userdata:
         self.dataFile = self.load_data()
 
     def loadData(self):
-        dirPath = str(os.getcwd()) + "\\userdata\\" + self.user + ".txt"
+        dirPath = os.getcwd() + "\\userdata\\" + self.user + ".txt"
         try:
             userFile = open(dirPath, "xb")
         except OSError:
