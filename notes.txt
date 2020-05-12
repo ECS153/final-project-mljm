@@ -1,0 +1,4 @@
+Currently have the path to the userdata as "home/vault/userdata/user_name" 
+    maybe hiding the username behind a random variable might make it harder to guess which user an attacker is looking at
+
+Upon creation of the database, it should create a file home/vault/userdata/
