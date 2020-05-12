@@ -1,5 +1,5 @@
 import os
-from sourcecode.db import *
+#from sourcecode.db import *
 
 class userdata:
     def __init__(self, user_name):
