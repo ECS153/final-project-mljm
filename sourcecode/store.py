@@ -6,7 +6,7 @@ class userdata:
         self.user = userName
         self.dataFile = self.load_data()
 
-    def load_data(self):
+    def loadData(self):
         dirPath = str(os.getcwd()) + "\\userdata\\" + self.user + ".txt"
         try:
             userFile = open(dirPath, "xb")
