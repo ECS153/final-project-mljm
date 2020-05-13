@@ -1,13 +1,13 @@
-#MEETING 5/12
+# MEETING 5/12
 
 **Last week:**   
-	- We discussed the basic design implementation of our project  
-	- A user will input a username, nick name of the website it is using, and a password  
-	- We'll have an encrypted database to store password and username    
-	- Not sure if we are going to create our own database or use an existing one  
-	- Not sure how to do the encryption part   
-	- Assigned a general task for each member of the group  
-	- Came up with with the name of the project: Vault  
+- We discussed the basic design implementation of our project  
+- A user will input a username, nick name of the website it is using, and a password  
+- We'll have an encrypted database to store password and username    
+- Not sure if we are going to create our own database or use an existing one  
+- Not sure how to do the encryption part   
+- Assigned a general task for each member of the group  
+- Came up with with the name of the project: Vault  
 
 **This week:** 
 	- We discussed in more detail the way each part of the project will be implemented  
