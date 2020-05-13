@@ -1,6 +1,6 @@
 #MEETING 5/12
 
-**Last week:** 
+**Last week:**   
 	* We discussed the basic design implementation of our project  
 	- A user will input a username, nick name of the website it is using, and a password  
 	- We'll have an encrypted database to store password and username    
