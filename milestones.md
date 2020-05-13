@@ -11,4 +11,4 @@
 - [Milestone 1 Video](add_link)
 
 ## Design Doc
- - [Milestone 1 Design Doc](add_link) 
+ - [Milestone 1 Design Doc]( https://docs.google.com/document/d/1ujVCgYwf1zLPJDel0ZfOD7EXjHBrkdQl8ac92_61CFU/edit# ) 
