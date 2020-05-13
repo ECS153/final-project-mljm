@@ -9,3 +9,6 @@
 
 ## Milestone Video
 - [Milestone 1 Video](add_link)
+
+## Design Doc
+ - [Milestone 1 Design Doc](add_link) 
