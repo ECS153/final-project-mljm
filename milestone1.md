@@ -1,0 +1,11 @@
+# Milestone 1
+
+## Meeting Notes
+- [Meeting 05/06](https://github.com/ECS153/final-project-mljm/blob/master/Meeting%200506.md)
+- [Meeting 05/12](add_link)
+
+## Commits
+- [Commits to Master](https://github.com/ECS153/final-project-mljm/commits/master)
+
+## Milestone Video
+- [Milestone 1 Video](add_link)
