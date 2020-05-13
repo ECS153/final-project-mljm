@@ -1,6 +1,33 @@
 # MEETING 5/12
 
+## Progress
+
+**Michael Ewing**
+
++ **last week:** Created the basic template for the storage system for the database.
++ **next week:** Continue adding functionality to the storage system and integrate it with the database, if time permits. 
+
+**Linqing Fu**
+
++ **last week:** Implemented encryption and decryption part. 
++ **next week:** Need to implement private key generator function and a hash function.
+
+**Jiahao Chen **
+
++ **last week:**  Basic functionality of storing and getting data 
++ **next week:**  Storing user account information 
+
+**Monica Ewing**
+
++ **last week:**  Worked on GUI part, can create windows.
++ **next week:**  Keep working on the GUI part.
+
+
+
+## Some Discussion
+
 **Last week:**   
+
 - We discussed the basic design implementation of our project  
 - A user will input a username, nick name of the website it is using, and a password  
 - We'll have an encrypted database to store password and username    
