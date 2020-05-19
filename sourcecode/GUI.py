@@ -1,3 +1,8 @@
+# for use on python3, use this import:
+# import tkinter as Tkinter
+# from tkinter import *
+
+# for use on python2, use this import:
 import Tkinter
 from Tkinter import *
 
