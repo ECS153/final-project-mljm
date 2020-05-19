@@ -2,10 +2,12 @@ from db import *
 from crypt import *
 
 db = Database("./ourdb")
-db.open("username", "password")
+db.registeruser("lynn", "11223344", "The university?", "ucdavis")
+if not db.login("lynn", "11223344"):
+    exit()
 
 key = "11364592315"
-mycry = MyCrypt()
+mycry = MyCrypt
 
 db.insert(mycry.AES_Encrypt(key, "boa"), mycry.AES_Encrypt(key, "bsdux333"), mycry.AES_Encrypt(key, "dasxc32156dv"))
 db.insert(mycry.AES_Encrypt(key, "boa2"), mycry.AES_Encrypt(key, "asdfdvcxv"), mycry.AES_Encrypt(key, "32dxcd622165"))
