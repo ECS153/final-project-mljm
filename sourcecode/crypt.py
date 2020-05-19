@@ -5,7 +5,6 @@ from Crypto.Cipher import AES
 import base64
 
 class MyCrypt:
-
     def padding_16(s):
         """ Pad the string to a multiple of 16 byte"""
         while len(s) % 16 != 0:

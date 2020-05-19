@@ -51,7 +51,7 @@ def removeprefix(user, nickname):
 class Database():
     def __init__(self, disk):
         #disk is the path of the file we store the data in
-        self.mycry = MyCrypt()
+        self.mycry = MyCrypt
         self.disk = os.path.expanduser(disk)
         #load userinfo file
         self.userinfo = os.path.expanduser("./userinfo")
@@ -59,29 +59,6 @@ class Database():
         self.load(self.disk)
         pass
     
-    def open(self, user, phrase):
-        #open database 
-        #user is string of the username for the user who is using the app
-        #phrase is string of the master password user enter for login
-        self.load(self.disk)
-        self.user = user
-        #calculate encryption/decryption key based on user and phrase here
-        (sha1_phrase, secQ, secA) = self.users[user]
-        self.key = calculatekey(sha1_phrase)
-        #chekc login here?
-        #do sha1 to phrase and check it with stored sha1_phrase
-        return True
-
-    def login(self, user, phrase):
-        #do sha1 to phrase and check it with stored sha1_phrase
-        pass
-
-    def calculatekey(self, phrase):
-        #calculate encryption/decryption key based on user's sha1_phrase
-        result = 1
-        #do whatever to make the key based on sha1_phrase
-        pass 
-
     def loaduserinfo(self, userinfo):
         if os.path.exists(userinfo):
             self.users = json.load(open(self.userinfo, "r"))
@@ -113,6 +90,37 @@ class Database():
         sha1_secA = self.mycry.SHA1(secA)
         self.users[user] = (sha1_phrase, secQ, sha1_secA)
         return True
+
+    def login(self, user, phrase):
+        #open database and check if the input master password is correct
+        #user is string of the username for the user who is using the app
+        #phrase is string of the master password user enter for login
+        if user not in self.users:
+            print("User not exist!")
+            return False
+
+        self.load(self.disk)
+        self.user = user
+        #calculate encryption/decryption key based on user and phrase here
+        (sha1_phrase, secQ, secA) = self.users[user]
+        self.key = self.calculatekey(sha1_phrase)
+        
+        #check login here
+        #do sha1 to phrase and check it with stored sha1_phrase
+        hashed = self.mycry.SHA1(phrase)
+        if hashed == sha1_phrase:
+            print("Login successfully")
+            return True
+        else:
+            print("Wrong master password")
+            return False
+
+    def calculatekey(self, phrase):
+        print(len(phrase))
+        #calculate encryption/decryption key based on user's sha1_phrase
+        #do whatever to make the key based on sha1_phrase
+        key = self.mycry.SHA1(phrase)
+        return key
 
     def insert(self, nickname, username, password):
         try:
@@ -156,11 +164,34 @@ class Database():
         print("deleted a record")
         return True
 
+    def fetchSQ(self, user):
+        # The user who forget master password should ask for answering security questions
+        # There should be an interaction: return the question to user and get an answer back from user
+        # Should it be implemented in two functions? 
+        if user not in self.users:
+            print("User not exist")
+            return False
+        (sha1_phrase, secQ, secA) = self.users[user]
+        self.tempsecA = secA
+        return secQ
+    
+    def checkSA(self, answer):
+        # Check if the security answer is correct
+        hashed = self.mycry.SHA1(answer)
+        if hashed == self.tempsecA:
+            self.tempsecA = None
+            print("Identity checked")
+            return True
+        else:
+            print("Wrong security answer")
+            return False
+
+
     def resetpassword(self, new_phrase):
         #reset master password
         #need to delete all old records for the user that was using the old password to encrypt
         #and restore them with the new key defined by the new password
-        new_sha1phrase = mycry.SHA1(new_phrase)
+        new_sha1phrase = self.mycry.SHA1(new_phrase)
         old_key = self.key
         new_key = calculatekey(new_sha1phrase)
         prefix = ""
