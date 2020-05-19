@@ -1,1 +1,0 @@
-{"johnsmith": {"amazon": ["jmna@gmailcom", "ksh3h95bd"]}}
