@@ -51,25 +51,43 @@ def removeprefix(user, nickname):
 class Database():
     def __init__(self, disk):
         #disk is the path of the file we store the data in
-        self.disk = os.path.expanduser(disk)
         self.mycry = MyCrypt()
+        self.disk = os.path.expanduser(disk)
+        #load userinfo file
+        self.userinfo = os.path.expanduser("./userinfo")
+        self.loaduserinfo(self.userinfo)
         self.load(self.disk)
         pass
     
     def open(self, user, phrase):
         #open database 
         #user is string of the username for the user who is using the app
-        #phrase is string of the master password
+        #phrase is string of the master password user enter for login
         self.load(self.disk)
         self.user = user
-        self.phrase = phrase
         #calculate encryption/decryption key based on user and phrase here
-        self.key = calculatekey(self.user, self.phrase)
+        (sha1_phrase, secQ, secA) = self.users[user]
+        self.key = calculatekey(sha1_phrase)
+        #chekc login here?
+        #do sha1 to phrase and check it with stored sha1_phrase
         return True
 
-    def calculatekey(self, user, phrase):
-        #calculate encryption/decryption key based on user and phrase
+    def login(self, user, phrase):
+        #do sha1 to phrase and check it with stored sha1_phrase
         pass
+
+    def calculatekey(self, phrase):
+        #calculate encryption/decryption key based on user's sha1_phrase
+        result = 1
+        #do whatever to make the key based on sha1_phrase
+        pass 
+
+    def loaduserinfo(self, userinfo):
+        if os.path.exists(userinfo):
+            self.users = json.load(open(self.userinfo, "r"))
+        else:
+            self.users = {}
+        return True
 
     def load(self, disk):
         if os.path.exists(disk):
@@ -82,9 +100,19 @@ class Database():
         #write back to disk
         try:
             json.dump(self.db, open(self.disk, "w+"))
+            json.dump(self.db, open(self.userinfo, "w+"))
             return True
         except:
             return False
+
+    def registeruser(self, user, phrase, secQ, secA):
+        if user in self.users:
+            print("same username existed")
+            return False
+        sha1_phrase = self.mycry.SHA1(phrase)
+        sha1_secA = self.mycry.SHA1(secA)
+        self.users[user] = (sha1_phrase, secQ, sha1_secA)
+        return True
 
     def insert(self, nickname, username, password):
         try:
@@ -130,11 +158,11 @@ class Database():
 
     def resetpassword(self, new_phrase):
         #reset master password
-        #need to delete all old record for the user that was using the old password
+        #need to delete all old records for the user that was using the old password to encrypt
         #and restore them with the new key defined by the new password
-        old_password = self.phrase
+        new_sha1phrase = mycry.SHA1(new_phrase)
         old_key = self.key
-        new_key = calculatekey(self.user, new_phrase)
+        new_key = calculatekey(new_sha1phrase)
         prefix = ""
         prefix += self.user + "_"
         for nickname in self.db:
@@ -154,7 +182,9 @@ class Database():
                 #store the new record and delete the old one 
                 self.db[new_nickname] = (new_username, new_password)
                 del self.db[nickname]
-        self.phrase = new_phrase
+        #edit sha1_phrase in userinfo
+        (sha1_phrase, secQ, secA) = self.users[user]
+        self.users[user] = (new_sha1phrase, secQ, secA)
         self.key = new_key
 
 
