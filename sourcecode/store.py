@@ -10,7 +10,7 @@ class dbData:
     def openDBData(self):
         dirPath =  'db_data.txt'
         try:
-            _db = open(dirPath, "xb")
+            _db = open(dirPath, "xt")
             _db.close()
             return dirPath
         except OSError:
@@ -63,7 +63,7 @@ class userData:
     def openUserData(self):
         dirPath = "user_data.txt"
         try:
-            _user = open(dirPath, 'xb')
+            _user = open(dirPath, 'xt')
             _user.close()
             return dirPath
         except OSError:
@@ -79,14 +79,28 @@ class userData:
         return record
 
     def writeData(self, user, record):
-        with open(self.userPath, 'w') as userFile:
+        with open(self.userPath, 'a+') as userFile:
+            # check if user exists in userFile
+            # if not, create user
             if os.path.getsize(self.userPath) == 0:
                 userDat = {}
                 userDat[user] = {}
+            # else load userData
             else:
                 userDat = json.load(userFile)
             for key,val in record.items():
-                userDat[user][key] = val
+                # check if user tag exists
+                if key in userDat:
+                    tempVal = userDat[user][key]
+                    # if user have more than 1 record for this tag
+                    if len(eval(var)) < 3:
+                        userDat = (eval(tempVal),) + (record,)
+                    # if user has 1 record for this tag
+                    else:
+                        userDat = eval(tempVal) + (record,)
+                #if not, create new tag key
+                else:
+                    userDat[user][key] = val
             json.dump(userDat, userFile)
             userFile.close()   
             del userDat
@@ -108,8 +122,8 @@ data['johnsmith']['netflix'] = '((jmna@gmailcom, maown2o%92fkn))'
 
 user = 'johnsmith'
 
-rec1 = {'amazon':'(jmna@gmailcom, ksh3h95bd)'}
-rec2 = {'netfilx': '(jmna@gmailcom, maown2o%92fkn)'}
+rec1 = {'amazon':('jmna@gmailcom', 'ksh3h95bd')}
+rec2 = {'netfilx': ('jmna@gmailcom', 'maown2o%92fkn')}
 
 
 dbf = dbData()
@@ -118,4 +132,5 @@ dbf.addUser('johnsmith', 'f5d16h4b68451b684', [])
 userf = userData()
 
 userf.writeData(user, rec1)
+userf.writeData(user, rec2)
 
