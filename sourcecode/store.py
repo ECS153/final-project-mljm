@@ -1,3 +1,6 @@
+## LIKELY WILL NOT BE USED ##
+## DELETE BEFORE SUBMISSION ##
+
 import os
 import json
 
