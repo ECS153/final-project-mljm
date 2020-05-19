@@ -1,90 +1,57 @@
 import Tkinter
-import tkMessageBox
 from Tkinter import *
 
-# Global variable for inputs
-'''def values():
-    global answer
-    answer = float(AnswerEntry.get())'''
 
-# Main Window layout
-MainWindow = Tkinter.Tk()
-MainWindow.title('THE VAULT')
-MainWindow.geometry("400x150+10+20")
+class LoginWindow():
+    def __init__(self):
+        # Main Window layout
+        self.MainWindow = Tkinter.Tk()
 
-# Labels for entries
-AccountNameLabel = Label(MainWindow, text = "Account \nName:", font = ("TimesRoman", 14))
-AccountNameLabel.place(x=20, y=30)
-MasterPasswordLabel = Label(MainWindow, text = "Master \nPassword:", font = ("TimesRoman", 14))
-MasterPasswordLabel.place(x=20, y=80)
+    def FirstWindow(self):
+        # Main Window layout
+        self.MainWindow.title('THE VAULT')
+        self.MainWindow.geometry("400x150+10+20")
 
-# User and password entry boxes
-AccountNameEntry = Entry(MainWindow, bd = 5)
-AccountNameEntry.place(x=100, y=30)
-MasterPasswordEntry = Entry(MainWindow, bd = 5, show ='*')
-MasterPasswordEntry.place(x=100, y=80)
+        # Labels for entries
+        accountNameLabel = Label(self.MainWindow, text="Account \nName:", font=("TimesRoman", 14))
+        accountNameLabel.place(x=20, y=30)
+        masterPasswordLabel = Label(self.MainWindow, text="Master \nPassword:", font=("TimesRoman", 14))
+        masterPasswordLabel.place(x=20, y=80)
 
-# Function that retrieves password for user
-def retrievePassword(tag):
-    print("username:", username.get())
-    print("password:", password.get())
-    return
+        # User and password entry boxes
+        accountNameEntry = Entry(self.MainWindow, bd=5)
+        accountNameEntry.place(x=100, y=30)
+        masterPasswordEntry = Entry(self.MainWindow, bd=5, show='*')
+        masterPasswordEntry.place(x=100, y=80)
 
-# Window that pops up after clicking login button
-def welcome():
-    # Answer Window layout
-    welcomeWindow = Tkinter.Tk()
-    welcomeWindow.title('Welcome')
-    welcomeWindow.geometry("400x100+10+20")
+        # Login button
+        loginButton = Tkinter.Button(self.MainWindow, text="Login", command=self.welcome)
+        loginButton.pack(side=BOTTOM)
+        loginButton.pack()
 
-    # Label for entry box
-    AnswerLabel = Label(welcomeWindow, text = "Retrieve or \n store password?:", font = ("TimesRoman", 14))
-    AnswerLabel.place(x=20, y=30)
+        self.MainWindow.mainloop()
 
-    # Answer entry box
-    AnswerEntry = Entry(welcomeWindow, bd = 5)
-    AnswerEntry.place(x=150, y=30)
+    # Window that pops up after clicking login button
+    def welcome(self):
+        # Answer Window layout
+        welcomeWindow = Tkinter.Tk()
+        welcomeWindow.title('WELCOME')
+        welcomeWindow.geometry("300x100")
 
-    def answerf():
-        if AnswerEntry.get().strip().lower == "retrieve":
-            # Retrieve Window layout
-            RetrieveWindow = Tkinter.Tk()
-            RetrieveWindow.title('Retrieve Passwords')
-            RetrieveWindow.geometry("400x150+10+20")
+        # Create frame for buttons
+        frame = Frame(welcomeWindow)
+        frame.pack()
 
-            #retrievePassword(tag)
+        # Retrieve button
+        retrieveButton = Button(frame, text="Retrieve", height="5", width="10")
+        retrieveButton.pack(side=LEFT)
 
-            # Passwords
-            PasswordLabel = Label(RetrieveWindow, text = "Passwords:", font = ("TimesRoman", 14))
-            PasswordLabel.place(x=20, y=30)
+        # Store button
+        storeButton = Button(frame, text="Store", height="5", width="10")
+        storeButton.pack(side=RIGHT)
 
-    # Enter button
-    EnterButton = Tkinter.Button(welcomeWindow, text ="Enter")
-    EnterButton.pack(side = BOTTOM)
-    EnterButton.configure(command=answerf)
-    EnterButton.pack()
+        welcomeWindow.mainloop()
 
 
-    '''def answer()
-    if AnswerEntry.get().strip().lower == "retrieve":
-        # Retrieve Window layout
-        RetrieveWindow = Tkinter.Tk()
-        RetrieveWindow.title('Retrieve Passwords')
-        RetrieveWindow.geometry("400x150+10+20")
-
-        # Passwords
-        PasswordLabel = Label(RetrieveWindow, text = "Passwords:", font = ("TimesRoman", 14))
-        PasswordLabel.place(x=20, y=30)
-
-        retrievePassword(tag)
-
-        End app
-        button_quit = Tkinter.Button(retrieveWindow, text = "Exit", command = retrieveWindow.quit)
-        button_quit.pack()'''
-
-# Login button
-LoginButton = Tkinter.Button(MainWindow, text ="Login", command = welcome)
-LoginButton.pack(side = BOTTOM)
-LoginButton.pack()
-
-MainWindow.mainloop()
+start = LoginWindow()
+start.FirstWindow()
