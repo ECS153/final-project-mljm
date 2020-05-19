@@ -12,35 +12,55 @@ class LoginWindow():
         self.MainWindow.title('THE VAULT')
         self.MainWindow.geometry("400x150+10+20")
 
+        mainFrame = Frame(self.MainWindow)
+        mainFrame.pack(fill="none", expand=True)
+
+        upperFrame = Frame(mainFrame)
+        upperFrame.pack(side=TOP, fill="none", expand=False)
+
+        lowerFrame = Frame(mainFrame)
+        lowerFrame.pack(side=BOTTOM, fill="none", expand=False)
+
+        labelFrame = Frame(upperFrame)
+        labelFrame.pack(side=LEFT)
+
+        boxFrame = Frame(upperFrame)
+        boxFrame.pack(side=RIGHT)
+
         # Labels for entries
-        accountNameLabel = Label(self.MainWindow, text="Account \nName:", font=("TimesRoman", 14))
-        accountNameLabel.place(x=20, y=30)
-        masterPasswordLabel = Label(self.MainWindow, text="Master \nPassword:", font=("TimesRoman", 14))
-        masterPasswordLabel.place(x=20, y=80)
+        accountNameLabel = Label(labelFrame, text="Account Name:", font=("TimesNewRoman", 14))
+        accountNameLabel.pack(side=TOP, fill=BOTH, pady=5)
+        masterPasswordLabel = Label(labelFrame, text="Master Password:", font=("TimesNewRoman", 14))
+        masterPasswordLabel.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # User and password entry boxes
-        accountNameEntry = Entry(self.MainWindow, bd=5)
-        accountNameEntry.place(x=100, y=30)
-        masterPasswordEntry = Entry(self.MainWindow, bd=5, show='*')
-        masterPasswordEntry.place(x=100, y=80)
+        accountNameEntry = Entry(boxFrame, bd=5)
+        accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
+        masterPasswordEntry = Entry(boxFrame, bd=5, show='*')
+        masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # Login button
-        loginButton = Tkinter.Button(self.MainWindow, text="Login", command=self.welcome)
-        loginButton.pack(side=BOTTOM)
+        loginButton = Tkinter.Button(lowerFrame, text="Login", command=self.welcome)
+        loginButton.pack(side=BOTTOM, expand=YES, pady=5)
         loginButton.pack()
 
         self.MainWindow.mainloop()
 
     # Window that pops up after clicking login button
     def welcome(self):
-        # Answer Window layout
+        # Welcome window layout
         welcomeWindow = Tkinter.Tk()
         welcomeWindow.title('WELCOME')
         welcomeWindow.geometry("300x100")
 
+
+        # backgroundImage= Tkinter.tk.PhotoImage(file"{}")
+        # imageLabel= Label(welcomeWindow, image=backgroundImage)
+        # imageLabel.pack()
+
         # Create frame for buttons
         frame = Frame(welcomeWindow)
-        frame.pack()
+        frame.pack(fill="none", expand=True)
 
         # Retrieve button
         retrieveButton = Button(frame, text="Retrieve", height="5", width="10")
