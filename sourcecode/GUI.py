@@ -3,6 +3,7 @@ import tkinter
 from tkinter import *
 
 class VaultApp():
+
     def __init__(self):
         # Main Window layout
         self.MainWindow = tkinter.Tk()
@@ -140,7 +141,6 @@ class VaultApp():
 
         #settingsWindow.mainloop()
 
-
     def welcome(self):
         # Welcome window layout
         welcomeWindow = tkinter.Tk()
@@ -169,6 +169,42 @@ class VaultApp():
         # Retrieve should take you to window that retrieves password
         actionMenu.add_command(label="Retrieve")
 
+        def open_Store():
+            st = Toplevel()
+            st.title("Store Passwords")
+            st.geometry("400x150")
+
+            # Create label
+            label = Label(st, text="Enter passwords to store")
+            label.pack()
+
+            # Create exit button.
+            exit_button = Button(st, text="Exit", command=st.destroy)
+            exit_button.pack()
+
+            # Create quit button.
+            quit_button = Button(st, text="Quit", command=st.quit)
+            quit_button.pack()
+            st.mainloop()
+
+        def open_Retrieve():
+            retrieve = Toplevel()
+            retrieve.title("Retrieve Passwords")
+            retrieve.geometry("400x150")
+
+            # Create label
+            label = Label(retrieve, text = "Select Passwords to Retrieve")
+            label.pack()
+
+            # Create exit button
+            exit_button = Button(retrieve, text = "Exit", command = retrieve.destroy)
+            exit_button.pack()
+
+            # Create quit button.
+            quit_button = Button(retrieve, text = "Quit", command = retrieve.quit)
+            quit_button.pack()
+            retrieve.mainloop()
+
         # Create frame for buttons in welcome window
         frame = Frame(welcomeWindow)
         frame.pack(fill="none", expand=True)
@@ -176,13 +212,13 @@ class VaultApp():
         frame.pack()
 
         # Retrieve button in welcome window
-        retrieveButton = Button(frame, text="Retrieve", height="2", width="10")
+        retrieveButton = Button(frame, text="Retrieve", height="2", width="10", command=open_Retrieve)
         retrieveButton.pack(side=LEFT, padx=10)
         retrieveButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
         retrieveButton.pack()
 
         # Store button in welcome window
-        storeButton = Button(frame, text="Store", height="2", width="10")
+        storeButton = Button(frame, text="Store", height="2", width="10", command=open_Store)
         storeButton.pack(side=RIGHT, padx=10)
         storeButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
         storeButton.pack()
