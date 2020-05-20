@@ -6,7 +6,7 @@
 
 ## Commits
 
-- [Commits to Master]()
+- [Commits to Master](https://github.com/ECS153/final-project-mljm/commits/master)
 
 ## Milestone Video
 
