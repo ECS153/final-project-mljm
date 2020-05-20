@@ -3,5 +3,5 @@ A password Manager
 
 + Project proposal: https://github.com/ECS153/final-project-mljm/blob/master/proposal.md
 + Milestone1: 
-+ Milestone2:
++ Milestone2: https://github.com/ECS153/final-project-mljm/blob/master/milestones2.md
 + Milestone3:
