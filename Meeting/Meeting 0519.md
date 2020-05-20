@@ -12,7 +12,7 @@
 + **last week:** Implemented SHA1 algorithm, helped implement some database operation.
 + **next week:** Help maintain the database part.
 
-**Jiahao Chen **
+**Jiahao Chen**
 
 + **last week:**  Implemented password reset part.
 + **next week:**  Keep maintaining the database part.
