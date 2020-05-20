@@ -57,6 +57,7 @@ class Database():
         self.userinfo = os.path.expanduser("./userinfo")
         self.loaduserinfo(self.userinfo)
         self.load(self.disk)
+        self.user = ""
         pass
     
     def loaduserinfo(self, userinfo):
@@ -168,6 +169,7 @@ class Database():
         # The user who forget master password should ask for answering security questions
         # There should be an interaction: return the question to user and get an answer back from user
         # Should it be implemented in two functions? 
+        self.user = user
         if user not in self.users:
             print("User not exist")
             return False
@@ -214,8 +216,8 @@ class Database():
                 self.db[new_nickname] = (new_username, new_password)
                 del self.db[nickname]
         #edit sha1_phrase in userinfo
-        (sha1_phrase, secQ, secA) = self.users[user]
-        self.users[user] = (new_sha1phrase, secQ, secA)
+        (sha1_phrase, secQ, secA) = self.users[self.user]
+        self.users[self.user] = (new_sha1phrase, secQ, secA)
         self.key = new_key
 
 
