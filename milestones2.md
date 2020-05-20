@@ -16,5 +16,5 @@
 
 ## Design Doc
 
- - [Milestone 2 Design Doc]( need to be added)
+ - [Milestone 2 Design Doc](https://docs.google.com/document/d/1Jn4pyi3RTMSNFaf_mFccCbdiVVgLfuaLf_hJ58U4L6A/edit)
 
