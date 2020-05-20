@@ -1,53 +1,50 @@
 import tkinter.font as tkFont
 import tkinter
 from tkinter import *
-# pip install pillow
-from PIL import Image, ImageTk
 
 class VaultApp():
-
     def __init__(self):
         # Main Window layout
         self.MainWindow = tkinter.Tk()
 
     def LoginWindow(self):
-
         # Main Window layout
         self.MainWindow.title('THE VAULT')
         self.MainWindow.geometry("450x200+300+200")
-        self.MainWindow.configure(bg="#66CC00")
+        self.MainWindow.configure(bg="#FFB266")
 
         # Frames for the main login window
-        mainFrame = Frame(self.MainWindow, bg="#66CC00")
+        mainFrame = Frame(self.MainWindow, bg="#FFB266")
         mainFrame.pack(fill="none", expand=True)
-        upperFrame = Frame(mainFrame, bg="#66CC00")
+        upperFrame = Frame(mainFrame, bg="#FFB266")
         upperFrame.pack(side=TOP, fill="none", expand=False)
-        lowerFrame = Frame(mainFrame, bg="#66CC00")
+        lowerFrame = Frame(mainFrame, bg="#FFB266")
         lowerFrame.pack(side=BOTTOM, fill="none", expand=False)
-        labelFrame = Frame(upperFrame, bg="#66CC00")
+        labelFrame = Frame(upperFrame, bg="#FFB266")
         labelFrame.pack(side=LEFT)
-        boxFrame = Frame(upperFrame, bg="#66CC00")
+        boxFrame = Frame(upperFrame, bg="#FFB266")
         boxFrame.pack(side=RIGHT)
 
         # Labels for entries for main login window
         times = tkFont.Font(family="TimesNewRoman", size=14)
-        accountNameLabel = Label(labelFrame, text="Account Name:", bg="#66CC00", font=times)
+        accountNameLabel = Label(labelFrame, text="Account Name:", bg="#FFB266", font=times)
         accountNameLabel.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg="#66CC00", font=times)
+        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg="#FFB266", font=times)
         masterPasswordLabel.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # User and password entry boxes for main login window
-        accountNameEntry = Entry(boxFrame, bd=5, bg="#3399FF")
+        accountNameEntry = Entry(boxFrame, bd=5, bg="#FFB266")
         accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordEntry = Entry(boxFrame, bd=5, bg="#3399FF", show='*')
+        accountNameEntry.configure(highlightbackground="#FFB266")
+        masterPasswordEntry = Entry(boxFrame, bd=5, bg="#FFB266", show='*')
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
+        masterPasswordEntry.configure(highlightbackground= "#FFB266")
 
 
         def Reset(self):
-
             # Reset Window layout
             ResetWindow = tkinter.Tk()
-            ResetWindow.title('Settings')
+            ResetWindow.title('Reset')
             ResetWindow.geometry("700x700")
 
             # Reset Window frames
@@ -76,17 +73,18 @@ class VaultApp():
             masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
 
             # Login button in reset window
-            loginButton = tkinter.Button(lowerFrame, text="Login", command=self.welcome)
-            loginButton.pack(side=BOTTOM, expand=YES, pady=20)
-            loginButton.pack()
+            EnterButton = tkinter.Button(lowerFrame, text="Login", command=self.welcome)
+            EnterButton.pack(side=BOTTOM, expand=YES, pady=20)
+            EnterButton.pack()
 
         # Login button in main login window
-        loginButton = tkinter.Button(lowerFrame, text="Login", bg="#66CC00", height=1, width=6, command=self.welcome)
+        loginButton = tkinter.Button(lowerFrame, text="Login", bg='#FFB266', height=1, width=6, command=self.welcome)
         loginButton.pack(side=TOP, expand=YES, pady=10)
+        loginButton.configure(relief=RAISED)
         loginButton.pack()
 
         # Link to reset the user's Account Name and Password in main login window
-        link = Label(lowerFrame, text="Forgot Master Password?", bg="#66CC00", fg="blue", cursor="arrow")
+        link = Label(lowerFrame, text="Forgot Master Password?", bg="#FFB266", fg="blue", cursor="arrow")
         link.pack(side=BOTTOM, expand=YES)
         link.bind("<Button-1>", Reset)
 
@@ -111,7 +109,7 @@ class VaultApp():
         filemenu.add_command(label="Exit", command=settingsWindow.quit)
 
         # Frames for the settings window
-        mainFrame = Frame(self.settingsWindow)
+        mainFrame = Frame(settingsWindow)
         mainFrame.pack(fill="none", expand=True)
         upperFrame = Frame(mainFrame)
         upperFrame.pack(side=TOP, fill="none", expand=False)
@@ -136,11 +134,11 @@ class VaultApp():
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # Login button in settings window
-        enterButton = tkinter.Button(lowerFrame, text="Login")
+        enterButton = tkinter.Button(lowerFrame, text="Enter")
         enterButton.pack(side=BOTTOM, expand=YES, pady=5)
         enterButton.pack()
 
-        settingsWindow.mainloop()
+        #settingsWindow.mainloop()
 
 
     def welcome(self):
@@ -177,8 +175,9 @@ class VaultApp():
         # image_label = Label(welcomeWindow, image=background_image)
         # image_label.pack(fill=BOTH, expand=YES)
 
-        # backgroundImage= tkinter.tk.PhotoImage("vault.jpg")
-        # imageLabel= Label(welcomeWindow, image=backgroundImage)
+        top = Toplevel(welcomeWindow)
+        # backgroundImage= tkinter.PhotoImage("vault.jpg")
+        # imageLabel= Label(top, image=backgroundImage)
         # imageLabel.pack()
 
         # v = Canvas(welcomeWindow, width=400, height=300)
@@ -199,14 +198,20 @@ class VaultApp():
         # Create frame for buttons in welcome window
         frame = Frame(welcomeWindow)
         frame.pack(fill="none", expand=True)
+        frame.configure(bg="#856ff8")
+        frame.pack()
 
         # Retrieve button in welcome window
-        retrieveButton = Button(frame, text="Retrieve", height="2", width="10")
-        retrieveButton.pack(side=LEFT, padx=2)
+        retrieveButton = Button(top, text="Retrieve", height="2", width="10")
+        retrieveButton.pack(side=LEFT, padx=10)
+        retrieveButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
+        retrieveButton.pack()
 
         # Store button in welcome window
         storeButton = Button(frame, text="Store", height="2", width="10")
-        storeButton.pack(side=RIGHT, padx=2)
+        storeButton.pack(side=RIGHT, padx=10)
+        storeButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
+        storeButton.pack()
 
         # welcomeWindow.mainloop()
 
