@@ -169,32 +169,6 @@ class VaultApp():
         # Retrieve should take you to window that retrieves password
         actionMenu.add_command(label="Retrieve")
 
-        # image = Image.open("vault.jpg")
-        # #img_copy = image.copy()
-        # background_image = self.ImageTk(image)
-        # image_label = Label(welcomeWindow, image=background_image)
-        # image_label.pack(fill=BOTH, expand=YES)
-
-        top = Toplevel(welcomeWindow)
-        # backgroundImage= tkinter.PhotoImage("vault.jpg")
-        # imageLabel= Label(top, image=backgroundImage)
-        # imageLabel.pack()
-
-        # v = Canvas(welcomeWindow, width=400, height=300)
-        # v.pack(fill=BOTH, expand=True)
-        # # img = PhotoImage(file='vault.jpg')
-        # img= ImageTk.PhotoImage(Image.open("vault.jpg"))
-        # v.create_image(20,20, image=img, anchor=NW)
-
-        # imageFrame = Frame(welcomeWindow)
-        # imageFrame.pack(fill=BOTH, expand=True)
-        #
-        # load = Image.open("vault.jpg")
-        # photo = ImageTk.PhotoImage(load)
-        # img = Label(self, image=photo)
-        # img.image = photo
-        # img.place(x=0, y=0)
-
         # Create frame for buttons in welcome window
         frame = Frame(welcomeWindow)
         frame.pack(fill="none", expand=True)
@@ -202,7 +176,7 @@ class VaultApp():
         frame.pack()
 
         # Retrieve button in welcome window
-        retrieveButton = Button(top, text="Retrieve", height="2", width="10")
+        retrieveButton = Button(frame, text="Retrieve", height="2", width="10")
         retrieveButton.pack(side=LEFT, padx=10)
         retrieveButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
         retrieveButton.pack()
