@@ -14,4 +14,4 @@
 
 ## Design Doc
 
- - [Milestone 1 Design Doc]() 
+ - [Milestone 2 Design Doc]() 
