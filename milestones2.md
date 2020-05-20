@@ -1,8 +1,8 @@
 # Milestone 2
 
 ## Meeting Notes
-- [Meeting ]()
-- [Meeting ]()
+- [Meeting 5/15](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200515.md)
+- [Meeting 5/19]()
 
 ## Commits
 
