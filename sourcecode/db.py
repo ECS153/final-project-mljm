@@ -78,7 +78,7 @@ class Database():
         #write back to disk
         try:
             json.dump(self.db, open(self.disk, "w+"))
-            json.dump(self.db, open(self.userinfo, "w+"))
+            json.dump(self.users, open(self.userinfo, "w+"))
             return True
         except:
             return False

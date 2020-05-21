@@ -2,7 +2,7 @@ from db import *
 
 class Handler():
     def __init__(self):
-        self.db = Database("./vautlDB")
+        self.db = Database("./vaultdb")
         self.charLimit = 64
 
 

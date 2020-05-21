@@ -79,9 +79,10 @@ class VaultApp():
 
     def LoginWindow(self):
         # Main Window layout
+        bgColor = "#4CA7B2"
         self.MainWindow.title('THE VAULT')
         self.MainWindow.geometry("500x225+300+200")
-        self.MainWindow.configure(bg="#FFB266")
+        self.MainWindow.configure(bg=bgColor)
 
         def login(aName, mPass):
             if (not aName) or (not mPass):
@@ -94,51 +95,51 @@ class VaultApp():
                     errorText.set(rtn)
 
         # Frames for the main login window
-        mainFrame = Frame(self.MainWindow, bg="#FFB266")
+        mainFrame = Frame(self.MainWindow, bg=bgColor)
         mainFrame.pack(fill="none", expand=True)
-        errorFrame = Frame(mainFrame, bg="#FFB266")
+        errorFrame = Frame(mainFrame, bg=bgColor)
         errorFrame.pack(side=TOP, fill="none", expand=False)
-        upperFrame = Frame(mainFrame, bg="#FFB266")
+        upperFrame = Frame(mainFrame, bg=bgColor)
         upperFrame.pack(side=TOP, fill="none", expand=False)
-        lowerFrame = Frame(mainFrame, bg="#FFB266")
+        lowerFrame = Frame(mainFrame, bg=bgColor)
         lowerFrame.pack(side=BOTTOM, fill="none", expand=False)
-        labelFrame = Frame(upperFrame, bg="#FFB266")
+        labelFrame = Frame(upperFrame, bg=bgColor)
         labelFrame.pack(side=LEFT)
-        boxFrame = Frame(upperFrame, bg="#FFB266")
+        boxFrame = Frame(upperFrame, bg=bgColor)
         boxFrame.pack(side=RIGHT)
 
         err = tkFont.Font(family="Arial", weight=tkFont.BOLD, size=14)
         errorText = tkinter.StringVar()
         errorText.set("")
-        errorLabel = Label(errorFrame, textvariable=errorText, bg="#FFB266", fg="#33393A", font=err )
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColor, fg="#D32600", font=err )
         errorLabel.pack()
 
         # Labels for entries for main login window
         times = tkFont.Font(family="TimesNewRoman", size=14)
-        accountNameLabel = Label(labelFrame, text="Account Name:", bg="#FFB266", font=times)
+        accountNameLabel = Label(labelFrame, text="Account Name:", bg=bgColor, font=times)
         accountNameLabel.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg="#FFB266", font=times)
+        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg=bgColor, font=times)
         masterPasswordLabel.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # User and password entry boxes for main login window
-        accountNameEntry = Entry(boxFrame, bd=5, bg="#FFB266")
+        accountNameEntry = Entry(boxFrame, bd=4, bg="#4697A1", fg="#F1F1F1")
         accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
-        accountNameEntry.configure(highlightbackground="#FFB266")
+        accountNameEntry.configure(highlightbackground="#4697A1")
         #actName = accountNameEntry.get()
-        masterPasswordEntry = Entry(boxFrame, bd=5, bg="#FFB266", show='*')
+        masterPasswordEntry = Entry(boxFrame, bd=4, bg="#4697A1", show='*', fg="#F1F1F1")
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
-        masterPasswordEntry.configure(highlightbackground= "#FFB266")
+        masterPasswordEntry.configure(highlightbackground= "#4697A1")
         #mPass = masterPasswordEntry.get()
 
         # Login button in main login window
-        loginButton = tkinter.Button(lowerFrame, text="Login", bg='#FFB266', height=1, width=6, command=lambda: login(accountNameEntry.get(),masterPasswordEntry.get()))
+        loginButton = tkinter.Button(lowerFrame, text="Login", bg="#4697A1", height=1, width=6, command=lambda: login(accountNameEntry.get(),masterPasswordEntry.get()))
         # lambda: self.openWindow("welcome")
         loginButton.pack(side=TOP, expand=YES, pady=10)
         loginButton.configure(relief=RAISED)
         loginButton.pack()
 
         # Link to reset the user's Account Name and Password in main login window
-        link = Label(lowerFrame, text="Forgot Master Password?", bg="#FFB266", fg="blue", cursor="arrow")
+        link = Label(lowerFrame, text="Forgot Master Password?", bg=bgColor, fg="blue", cursor="arrow")
         link.pack(side=BOTTOM, expand=YES)
         link.bind("<Button-1>", lambda r: self.openWindow("reset"))
 
