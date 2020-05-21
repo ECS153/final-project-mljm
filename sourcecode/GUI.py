@@ -75,6 +75,15 @@ class VaultApp():
             else:
                 pass
 
+    def login(self, aName, mPass):
+        if (not aName) or (not mPass):
+            errorText.set("Enter an Account Name and Password")
+        else:
+            rtn = self.handler.login(aName, mPass)
+            if isinstance(rtn, bool):
+                self.openWindow("welcome")
+            else:
+                errorText.set(rtn)
 
 
     def LoginWindow(self):
@@ -84,15 +93,6 @@ class VaultApp():
         self.MainWindow.geometry("500x225+300+200")
         self.MainWindow.configure(bg=bgColor)
 
-        def login(aName, mPass):
-            if (not aName) or (not mPass):
-                errorText.set("Enter an Account Name and Password")
-            else:
-                rtn = self.handler.login(aName, mPass)
-                if isinstance(rtn, bool):
-                    self.openWindow("welcome")
-                else:
-                    errorText.set(rtn)
 
         # Frames for the main login window
         mainFrame = Frame(self.MainWindow, bg=bgColor)
@@ -132,7 +132,7 @@ class VaultApp():
         #mPass = masterPasswordEntry.get()
 
         # Login button in main login window
-        loginButton = tkinter.Button(lowerFrame, text="Login", bg="#4697A1", height=1, width=6, command=lambda: login(accountNameEntry.get(),masterPasswordEntry.get()))
+        loginButton = tkinter.Button(lowerFrame, text="Login", bg="#4697A1", height=1, width=6, command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get()))
         # lambda: self.openWindow("welcome")
         loginButton.pack(side=TOP, expand=YES, pady=10)
         loginButton.configure(relief=RAISED)
@@ -178,11 +178,11 @@ class VaultApp():
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # Login button in reset window
-        EnterButton = tkinter.Button(lowerFrame, text="Login", command=lambda: self.openWindow("welcome"))
+        EnterButton = tkinter.Button(lowerFrame, text="Login", command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get()))
         EnterButton.pack(side=BOTTOM, expand=YES, pady=20)
         EnterButton.pack()
 
-        self.MainWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWin("self.ResetWindow"))
+        self.ResetWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWin("self.ResetWindow"))
 
 
     # Create a settings window
