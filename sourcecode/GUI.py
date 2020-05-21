@@ -1,11 +1,13 @@
 import tkinter.font as tkFont
 import tkinter
 from tkinter import *
+from handler import *
 
 class VaultApp():
 
     def __init__(self):
         # Main Window layout
+        self.handler = Handler()
         self.MainWindow = tkinter.Tk()
         self.welcomeWindow = None
         self.settingsWindow = None
@@ -74,15 +76,28 @@ class VaultApp():
                 pass
 
 
+
     def LoginWindow(self):
         # Main Window layout
         self.MainWindow.title('THE VAULT')
-        self.MainWindow.geometry("450x200+300+200")
+        self.MainWindow.geometry("500x225+300+200")
         self.MainWindow.configure(bg="#FFB266")
+
+        def login(aName, mPass):
+            if (not aName) or (not mPass):
+                errorText.set("Enter an Account Name and Password")
+            else:
+                rtn = self.handler.login(aName, mPass)
+                if isinstance(rtn, bool):
+                    self.openWindow("welcome")
+                else:
+                    errorText.set(rtn)
 
         # Frames for the main login window
         mainFrame = Frame(self.MainWindow, bg="#FFB266")
         mainFrame.pack(fill="none", expand=True)
+        errorFrame = Frame(mainFrame, bg="#FFB266")
+        errorFrame.pack(side=TOP, fill="none", expand=False)
         upperFrame = Frame(mainFrame, bg="#FFB266")
         upperFrame.pack(side=TOP, fill="none", expand=False)
         lowerFrame = Frame(mainFrame, bg="#FFB266")
@@ -91,6 +106,12 @@ class VaultApp():
         labelFrame.pack(side=LEFT)
         boxFrame = Frame(upperFrame, bg="#FFB266")
         boxFrame.pack(side=RIGHT)
+
+        err = tkFont.Font(family="Arial", weight=tkFont.BOLD, size=14)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg="#FFB266", fg="#33393A", font=err )
+        errorLabel.pack()
 
         # Labels for entries for main login window
         times = tkFont.Font(family="TimesNewRoman", size=14)
@@ -103,12 +124,15 @@ class VaultApp():
         accountNameEntry = Entry(boxFrame, bd=5, bg="#FFB266")
         accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
         accountNameEntry.configure(highlightbackground="#FFB266")
+        #actName = accountNameEntry.get()
         masterPasswordEntry = Entry(boxFrame, bd=5, bg="#FFB266", show='*')
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
         masterPasswordEntry.configure(highlightbackground= "#FFB266")
+        #mPass = masterPasswordEntry.get()
 
         # Login button in main login window
-        loginButton = tkinter.Button(lowerFrame, text="Login", bg='#FFB266', height=1, width=6, command=lambda: self.openWindow("welcome"))
+        loginButton = tkinter.Button(lowerFrame, text="Login", bg='#FFB266', height=1, width=6, command=lambda: login(accountNameEntry.get(),masterPasswordEntry.get()))
+        # lambda: self.openWindow("welcome")
         loginButton.pack(side=TOP, expand=YES, pady=10)
         loginButton.configure(relief=RAISED)
         loginButton.pack()
@@ -120,7 +144,6 @@ class VaultApp():
 
         self.MainWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWin("self.MainWindow"))
         self.MainWindow.mainloop()
-
 
     def Reset(self):
         # Reset Window layout

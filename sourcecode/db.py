@@ -219,6 +219,7 @@ class Database():
         (sha1_phrase, secQ, secA) = self.users[self.user]
         self.users[self.user] = (new_sha1phrase, secQ, secA)
         self.key = new_key
+        return True
 
 
 
