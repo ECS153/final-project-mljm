@@ -75,71 +75,72 @@ class VaultApp():
             else:
                 pass
 
-    def login(self, aName, mPass):
+    def login(self, aName, mPass, erro):
         if (not aName) or (not mPass):
-            errorText.set("Enter an Account Name and Password")
+            erro.set("Enter an Account Name and Password")
         else:
             rtn = self.handler.login(aName, mPass)
             if isinstance(rtn, bool):
                 self.openWindow("welcome")
             else:
-                errorText.set(rtn)
+                erro.set(rtn)
 
 
     def LoginWindow(self):
         # Main Window layout
-        bgColor = "#4CA7B2"
+        bgColorMain = "#4CA7B2"
+        bgColorSub = "#4697A1"
         self.MainWindow.title('THE VAULT')
         self.MainWindow.geometry("500x225+300+200")
-        self.MainWindow.configure(bg=bgColor)
+        self.MainWindow.configure(bg=bgColorMain)
 
 
         # Frames for the main login window
-        mainFrame = Frame(self.MainWindow, bg=bgColor)
+        mainFrame = Frame(self.MainWindow, bg=bgColorMain)
         mainFrame.pack(fill="none", expand=True)
-        errorFrame = Frame(mainFrame, bg=bgColor)
+        errorFrame = Frame(mainFrame, bg=bgColorMain)
         errorFrame.pack(side=TOP, fill="none", expand=False)
-        upperFrame = Frame(mainFrame, bg=bgColor)
+        upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False)
-        lowerFrame = Frame(mainFrame, bg=bgColor)
+        lowerFrame = Frame(mainFrame, bg=bgColorMain)
         lowerFrame.pack(side=BOTTOM, fill="none", expand=False)
-        labelFrame = Frame(upperFrame, bg=bgColor)
+        labelFrame = Frame(upperFrame, bg=bgColorMain)
         labelFrame.pack(side=LEFT)
-        boxFrame = Frame(upperFrame, bg=bgColor)
+        boxFrame = Frame(upperFrame, bg=bgColorMain)
         boxFrame.pack(side=RIGHT)
 
         err = tkFont.Font(family="Arial", weight=tkFont.BOLD, size=14)
         errorText = tkinter.StringVar()
         errorText.set("")
-        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColor, fg="#D32600", font=err )
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#D32600", font=err )
         errorLabel.pack()
 
         # Labels for entries for main login window
         times = tkFont.Font(family="TimesNewRoman", size=14)
-        accountNameLabel = Label(labelFrame, text="Account Name:", bg=bgColor, font=times)
+        accountNameLabel = Label(labelFrame, text="Account Name:", bg=bgColorMain, font=times)
         accountNameLabel.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg=bgColor, font=times)
+        masterPasswordLabel = Label(labelFrame, text="Master Password:", bg=bgColorMain, font=times)
         masterPasswordLabel.pack(side=BOTTOM, fill=BOTH, pady=5)
 
         # User and password entry boxes for main login window
-        accountNameEntry = Entry(boxFrame, bd=4, bg="#4697A1", fg="#F1F1F1")
+        accountNameEntry = Entry(boxFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
         accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
-        accountNameEntry.configure(highlightbackground="#4697A1")
+        accountNameEntry.configure(highlightbackground=bgColorSub)
         #actName = accountNameEntry.get()
-        masterPasswordEntry = Entry(boxFrame, bd=4, bg="#4697A1", show='*', fg="#F1F1F1")
+        masterPasswordEntry = Entry(boxFrame, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
-        masterPasswordEntry.configure(highlightbackground= "#4697A1")
+        masterPasswordEntry.configure(highlightbackground= bgColorSub)
         #mPass = masterPasswordEntry.get()
 
         # Login button in main login window
-        loginButton = tkinter.Button(lowerFrame, text="Login", bg="#4697A1", height=1, width=6, command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get()))
+        loginButton = tkinter.Button(lowerFrame, text="Login", bg=bgColorSub, height=1, width=6, command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get(), errorText))
         # lambda: self.openWindow("welcome")
         loginButton.pack(side=TOP, expand=YES, pady=10)
         loginButton.configure(relief=RAISED)
         loginButton.pack()
 
         # Link to reset the user's Account Name and Password in main login window
-        link = Label(lowerFrame, text="Forgot Master Password?", bg=bgColor, fg="blue", cursor="arrow")
+        link = Label(lowerFrame, text="Forgot Master Password?", bg=bgColorMain, fg="blue", cursor="arrow")
         link.pack(side=BOTTOM, expand=YES)
         link.bind("<Button-1>", lambda r: self.openWindow("reset"))
 
@@ -238,6 +239,9 @@ class VaultApp():
 
 
     def welcome(self):
+        bgColorMain = "#856ff8"
+        bgColorSub = "#765EEF"
+
         # Welcome window layout
         self.welcomeWindow = tkinter.Tk()
         self.welcomeWindow.title('WELCOME')
@@ -245,7 +249,7 @@ class VaultApp():
 
         # Create a menu bar in welcome window
         menu_bar = Menu(self.welcomeWindow)
-        self.welcomeWindow.config(menu=menu_bar, bg="#856ff8")
+        self.welcomeWindow.config(menu=menu_bar, bg=bgColorMain)
 
         # Create a File drop down menu in welcome window
         filemenu = Menu(menu_bar, tearoff=0)
@@ -269,19 +273,19 @@ class VaultApp():
         # Create frame for buttons in welcome window
         frame = Frame(self.welcomeWindow)
         frame.pack(fill="none", expand=True)
-        frame.configure(bg="#856ff8")
+        frame.configure(bg=bgColorMain)
         frame.pack()
 
         # Retrieve button in welcome window
         retrieveButton = Button(frame, text="Retrieve", height="2", width="10", command=lambda: self.openWindow("retrieve"))
         retrieveButton.pack(side=LEFT, padx=10)
-        retrieveButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
+        retrieveButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
         retrieveButton.pack()
 
         # Store button in welcome window
         storeButton = Button(frame, text="Store", height="2", width="10", command=lambda: self.openWindow("store"))
         storeButton.pack(side=RIGHT, padx=10)
-        storeButton.configure(bg="#856ff8", relief=RAISED, state=ACTIVE)
+        storeButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
         storeButton.pack()
 
         self.welcomeWindow.protocol("WM_DELETE_WINDOW", self.cascadeDestroy)

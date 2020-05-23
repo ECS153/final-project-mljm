@@ -4,10 +4,11 @@ class Handler():
     def __init__(self):
         self.db = Database("./vaultdb")
         self.charLimit = 64
+        self.charMin = 4
 
 
     def modInput(self, var):
-        if len(str(var)) < self.charLimit:
+        if (len(str(var)) < self.charLimit) and (len(str(var)) >= self.charMin):
             return str(var)
         else:
             return False
