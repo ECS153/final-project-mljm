@@ -100,7 +100,7 @@ class Database():
             print("User not exist!")
             return False
 
-        self.load(self.disk)
+        # self.load(self.disk)
         self.user = user
         (sha1_phrase, email) = self.users[user]
         #calculate encryption/decryption key based on user and phrase here
@@ -170,7 +170,7 @@ class Database():
 
     def delete(self, nickname):
         nickname = adduserprefix(self.user, nickname)
-        nickname = addchar(nickname,1)
+        # nickname = addchar(nickname,1)
         nickname = self.mycry.AES_Encrypt(self.key, nickname)
         if not nickname in self.db:
             return False
