@@ -89,6 +89,7 @@ class Database():
             return False
         sha1_phrase = self.mycry.SHA1(phrase)
         self.users[user] = (sha1_phrase, email)
+        json.dump(self.users, open(self.userinfo, "w+"))
         return True
 
     def login(self, user, phrase):
@@ -143,6 +144,7 @@ class Database():
             password = self.mycry.AES_Encrypt(self.key, password)
             self.db[nickname] = (username,password)
             print("stored a record")
+            json.dump(self.db, open(self.disk, "w+"))
             return True
         except:
             print("error happen when inserting ")
@@ -174,6 +176,7 @@ class Database():
             return False
         del self.db[nickname]
         print("deleted a record")
+        json.dump(self.db, open(self.disk, "w+"))
         return True
     
     def fetchEmail(self, user):
