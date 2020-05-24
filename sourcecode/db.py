@@ -176,6 +176,7 @@ class Database():
             return False
         del self.db[nickname]
         print("deleted a record")
+        json.dump(self.db, open(self.disk, "w+"))
         return True
     
     def fetchEmail(self, user):
