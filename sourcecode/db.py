@@ -233,7 +233,6 @@ class Database():
         for nickname in password_nicknames:
             print("change dictionary")
             # decrypt to get original record data
-            # nickname shouldn't be encrypted, or it cannot find correct item using prefix
             (old_username,old_password) = self.db[nickname]
             old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
             old_username = self.mycry.AES_Decrypt(old_key, old_username)
