@@ -138,7 +138,7 @@ class Database():
             # nickname = addchar(nickname,1)
             username = addchar(username,2)
             password = addchar(password,3)
-            # nickname = self.mycry.AES_Encrypt(self.key, nickname)
+            nickname = self.mycry.AES_Encrypt(self.key, nickname)
             username = self.mycry.AES_Encrypt(self.key, username)
             password = self.mycry.AES_Encrypt(self.key, password)
             self.db[nickname] = (username,password)
@@ -153,8 +153,8 @@ class Database():
         # Return the username and password for that website 
         try:
             nickname = adduserprefix(self.user, nickname)
-            # nickname = addchar(nickname,1)
-            # nickname = self.mycry.AES_Encrypt(self.key, nickname)
+            #nickname = addchar(nickname,1)
+            nickname = self.mycry.AES_Encrypt(self.key, nickname)
             (username, password) = self.db[nickname]
             username = self.mycry.AES_Decrypt(self.key, username)
             password = self.mycry.AES_Decrypt(self.key, password)
@@ -169,7 +169,7 @@ class Database():
     def delete(self, nickname):
         nickname = adduserprefix(self.user, nickname)
         nickname = addchar(nickname,1)
-        #nickname = self.mycry.AES_Encrypt(key, nickname)
+        nickname = self.mycry.AES_Encrypt(self.key, nickname)
         if not nickname in self.db:
             return False
         del self.db[nickname]
@@ -221,28 +221,37 @@ class Database():
         new_key = self.calculatekey(new_sha1phrase)
         prefix = ""
         prefix += user + "_"
+        password_nicknames = []
         for nickname in self.db:
             #for each nickname in the file
             #if it starts with the current username then it belongs to the user
-            if nickname.startswith(prefix):
-                # decrypt to get original record data
-                # nickname shouldn't be encrypted, or it cannot find correct item using prefix
-                (old_username,old_password) = self.db[nickname]
-                # old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
-                old_username = self.mycry.AES_Decrypt(old_key, old_username)
-                old_password = self.mycry.AES_Decrypt(old_key, old_password)
-                
-                #adding prefix and character are skipped because they are already there 
-                #encrypt record data with new key
-                # new_nickname = self.mycry.AES_Encrypt(new_key, old_nickname)
-                new_username = self.mycry.AES_Encrypt(new_key, old_username)
-                new_password = self.mycry.AES_Encrypt(new_key, old_password)
-                #store the new record and delete the old one 
-                # del self.db[nickname]
-                self.db[nickname] = (new_username, new_password)
+            print("nickname = ", nickname)
+            old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
+            if old_nickname.startswith(prefix):
+                print("this password belong to the user")
+                password_nicknames.append(nickname)
+        for nickname in password_nicknames:
+            print("change dictionary")
+            # decrypt to get original record data
+            # nickname shouldn't be encrypted, or it cannot find correct item using prefix
+            (old_username,old_password) = self.db[nickname]
+            old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
+            old_username = self.mycry.AES_Decrypt(old_key, old_username)
+            old_password = self.mycry.AES_Decrypt(old_key, old_password)
+            
+            #adding prefix and character are skipped because they are already there 
+            #encrypt record data with new key
+            new_nickname = self.mycry.AES_Encrypt(new_key, old_nickname)
+            new_username = self.mycry.AES_Encrypt(new_key, old_username)
+            new_password = self.mycry.AES_Encrypt(new_key, old_password)
+            #store the new record and delete the old one 
+            self.db[new_nickname] = (new_username, new_password)
+            del self.db[nickname]
+            print("added entry, deleted old entry")
+            #self.db[nickname] = (old_username, old_password)
         #edit sha1_phrase in userinfo
         self.users[user] = (new_sha1phrase, email)
-        # self.key = new_key
+        self.key = new_key
         return True
 
 

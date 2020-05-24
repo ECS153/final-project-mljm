@@ -21,9 +21,10 @@ print(db.get("google"))
 print(db.get("amazon"))
 
 db.resetpassword("admin", "password")
-db.close()
-if not db.login("admin", "password"):
-    exit()
+print("master password changed")
+#db.close()
+#if not db.login("admin", "password"):
+#    exit()
 
 print(db.get("boa2"))
 print(db.get("google"))
