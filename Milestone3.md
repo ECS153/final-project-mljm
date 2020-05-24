@@ -2,8 +2,8 @@
 
 ## Meeting Notes
 
-- [Meeting 5/22](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200515.md)
-- [Meeting 5/](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200519.md)
+- [Meeting 5/22](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200522.md)
+- [Meeting 5/]()
 ## Commits
 
 - [Commits to Master](https://github.com/ECS153/final-project-mljm/commits/master)
