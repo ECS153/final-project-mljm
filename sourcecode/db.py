@@ -116,19 +116,29 @@ class Database():
             return False
 
     def calculatekey(self, phrase):
-        # print(len(phrase))
         #calculate encryption/decryption key based on user's sha1_phrase
         #do whatever to make the key based on sha1_phrase
-        key = self.mycry.SHA1(phrase)
+        # the key's length is 16 chars
+        raw = self.mycry.SHA1(phrase)
+        h0 = int(raw[0:8], 16)
+        h1 = int(raw[8:16], 16)
+        h2 = int(raw[16:24], 16)
+        h3 = int(raw[24:32], 16)
+        h4 = int(raw[32:40], 16)
+
+        h0 = h0 & h1
+        h2 = h2 & h3 | h4        
+        key = "%08x%08x" % (h0, h2)
+
         return key
 
     def insert(self, nickname, username, password):
         try:
             nickname = adduserprefix(self.user, nickname)
-            nickname = addchar(nickname,1)
+            # nickname = addchar(nickname,1)
             username = addchar(username,2)
             password = addchar(password,3)
-            nickname = self.mycry.AES_Encrypt(self.key, nickname)
+            # nickname = self.mycry.AES_Encrypt(self.key, nickname)
             username = self.mycry.AES_Encrypt(self.key, username)
             password = self.mycry.AES_Encrypt(self.key, password)
             self.db[nickname] = (username,password)
@@ -139,10 +149,12 @@ class Database():
             return False
     
     def get(self, nickname):
+        # Given a nickname for a website
+        # Return the username and password for that website 
         try:
             nickname = adduserprefix(self.user, nickname)
-            nickname = addchar(nickname,1)
-            nickname = self.mycry.AES_Encrypt(self.key, nickname)
+            # nickname = addchar(nickname,1)
+            # nickname = self.mycry.AES_Encrypt(self.key, nickname)
             (username, password) = self.db[nickname]
             username = self.mycry.AES_Decrypt(self.key, username)
             password = self.mycry.AES_Decrypt(self.key, password)
@@ -212,22 +224,23 @@ class Database():
         for nickname in self.db:
             #for each nickname in the file
             #if it starts with the current username then it belongs to the user
-            if nickname.startswith('prefix'):
-                #decrypt to get original record data
+            if nickname.startswith(prefix):
+                # decrypt to get original record data
+                # nickname shouldn't be encrypted, or it cannot find correct item using prefix
                 (old_username,old_password) = self.db[nickname]
-                old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
+                # old_nickname = self.mycry.AES_Decrypt(old_key, nickname)
                 old_username = self.mycry.AES_Decrypt(old_key, old_username)
                 old_password = self.mycry.AES_Decrypt(old_key, old_password)
+                
                 #adding prefix and character are skipped because they are already there 
                 #encrypt record data with new key
-                new_nickname = self.mycry.AES_Encrypt(new_key, old_nickname)
+                # new_nickname = self.mycry.AES_Encrypt(new_key, old_nickname)
                 new_username = self.mycry.AES_Encrypt(new_key, old_username)
                 new_password = self.mycry.AES_Encrypt(new_key, old_password)
                 #store the new record and delete the old one 
-                self.db[new_nickname] = (new_username, new_password)
-                del self.db[nickname]
+                # del self.db[nickname]
+                self.db[nickname] = (new_username, new_password)
         #edit sha1_phrase in userinfo
-        (sha1_phrase, email) = self.users[user]
         self.users[user] = (new_sha1phrase, email)
         # self.key = new_key
         return True

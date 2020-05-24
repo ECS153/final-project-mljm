@@ -4,19 +4,31 @@ from crypt import *
 db = Database("./vaultdb")
 
 # print(db.fetchEmail("admin"))
-# db.resetpassword("admin", "pwd123456")
 
-# db.registeruser("admin", "password", "admin@ucdavis.edu")
+db.registeruser("admin", "pwd123456", "admin@ucdavis.edu")
 if not db.login("admin", "pwd123456"):
     exit()
 
-key = "11364592315"
-mycry = MyCrypt
 
-db.insert(mycry.AES_Encrypt(key, "boa"), mycry.AES_Encrypt(key, "bsdux333"), mycry.AES_Encrypt(key, "dasxc32156dv"))
-db.insert(mycry.AES_Encrypt(key, "boa2"), mycry.AES_Encrypt(key, "asdfdvcxv"), mycry.AES_Encrypt(key, "32dxcd622165"))
-db.insert(mycry.AES_Encrypt(key, "google"), mycry.AES_Encrypt(key, "baxcxcz"), mycry.AES_Encrypt(key, "d15165649595dv"))
-db.insert(mycry.AES_Encrypt(key, "amazon"), mycry.AES_Encrypt(key, "adgfhjtfd"), mycry.AES_Encrypt(key, "das51c54vd46asds"))
+db.insert("boa", "bsdux333", "dasxc32156dv")
+db.insert("boa2", "asdfdvcxv", "32dxcd622165")
+db.insert("google", "baxcxcz", "d15165649595dv")
+db.insert("amazon", "adgfhjtfd", "das51c54vd46asds")
+
+print(db.get("boa"))
+print(db.get("boa2"))
+print(db.get("google"))
+print(db.get("amazon"))
+
+db.resetpassword("admin", "password")
+db.close()
+if not db.login("admin", "password"):
+    exit()
+
+print(db.get("boa2"))
+print(db.get("google"))
+print(db.get("amazon"))
+
 
 # (a,b) = db.get(mycry.AES_Encrypt(key, "boa"))
 # if a != None and b != None:

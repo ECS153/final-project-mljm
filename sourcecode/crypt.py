@@ -6,7 +6,7 @@ import base64
 
 class MyCrypt:
     def padding_16(s):
-        """ Pad the string to a multiple of 16 byte"""
+        """ Pad the string to exactly 16 bytes(length of 16)"""
         while len(s) % 16 != 0:
             s += b'\x00'
         return s
@@ -43,7 +43,7 @@ class MyCrypt:
         """
         ECB Encryption
         Arguments: 
-            key: The key used to encrypt the data.
+            key: The key used to encrypt the data. (AES only supports key sizes of 16, 24 or 32 bytes)
             data: The data waiting to be encrypted.
 
         Return: 
@@ -80,7 +80,7 @@ class MyCrypt:
             data = data.decode('utf8').strip('\0')
             return data
         except:
-            print("Password Retrieving Error")
+            print("Decryption Error")
             return '\0'
 
     @classmethod
@@ -154,8 +154,8 @@ class MyCrypt:
         return "%08x%08x%08x%08x%08x" % (H0, H1, H2, H3, H4)
 
 if __name__ == '__main__':
-    # key = '11223344'
-    # plain_data = 'flq970927'
+    # key = '674522f1efcdab85183adce8702e547542d2c1df'
+    # plain_data = 'ucdavis123456'
 
     # cipher_text = MyCrypt.AES_Encrypt(key, plain_data)
     # key2 = '1122334'
