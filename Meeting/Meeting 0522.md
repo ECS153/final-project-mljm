@@ -1,4 +1,4 @@
-# MEETING 05/22
+# 05/22
 
 + Prof. suggestion: use SMS/email to reset password.
 
