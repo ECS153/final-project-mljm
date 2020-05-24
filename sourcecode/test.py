@@ -2,8 +2,12 @@ from db import *
 from crypt import *
 
 db = Database("./vaultdb")
-db.registeruser("admin", "password", "The university?", "ucdavis")
-if not db.login("admin", "password"):
+
+# print(db.fetchEmail("admin"))
+# db.resetpassword("admin", "pwd123456")
+
+# db.registeruser("admin", "password", "admin@ucdavis.edu")
+if not db.login("admin", "pwd123456"):
     exit()
 
 key = "11364592315"
@@ -22,10 +26,4 @@ db.insert(mycry.AES_Encrypt(key, "amazon"), mycry.AES_Encrypt(key, "adgfhjtfd"),
 #     print(mycry.AES_Decrypt(key,a),mycry.AES_Decrypt(key,b))
 # db.delete(mycry.AES_Encrypt(key, "boa"))
 # print(db.get(mycry.AES_Encrypt(key, "boa")))
-db.close()
-
-db = Database("./vaultdb")
-if not db.login("admin", "password"):
-    exit()
-
 db.close()
