@@ -13,35 +13,31 @@ class Handler():
         else:
             return False
 
-    def signUp(self, username, password, secQ, secA):
-        # Check size of inputs and ensure they are strings
-        cleanName, cleanPass, cleanSecA = map(modInput, (username, password, secA))
-        cleanSecQ  = self.modInput(secQ)
+    def closeDB(self):
+        self.db.close()
 
+    def signUp(self, username, password, email):
+        # Check size of inputs and ensure they are strings
+        cleanName, cleanPass, cleanEmail = map(self.modInput, (username, password, email))
         # Check the output of the modifications
-        badStr = ""
-        for i,n in enumerate([cleanName, cleanPass, cleanSecQ, cleanSecA]):
+        for n in enumerate([cleanName, cleanPass, cleanEmail]):
             if n:
                 pass
             else:
-                badStr = badStr + str("\nYour "+vars[i]+" is beyond the characer limit")
-        # If an input is beyond the character limit, return an error message
-        if(len(badStr) > 0):
-            return badStr
+                return "One or more inputs excede the 64-characer limit"
         
         # If all is good, register user
-        rtn = self.db.registeruser(
-            cleanName, cleanPass, cleanSecQ, cleanSecA)
+        rtn = self.db.registeruser(cleanName, cleanPass, cleanEmail)
         # If registration occurs correctly, return True,
         # else, return an error message
         if(rtn):
             return True
         else:
-            return "That Username Already Exists"
+            return "Please Choose a different Account Name"
 
     def login(self, username, password):
         cleanName, cleanPass = map(self.modInput, (username, password))
-        for i,n in enumerate([cleanName, cleanPass]):
+        for n in enumerate([cleanName, cleanPass]):
             if n:
                 pass
             else:
@@ -52,21 +48,15 @@ class Handler():
         else:
             return "Incorrect Username or Password"
 
-    def store(self, username, password, tag):
+    def store(self, tag, username, password):
         cleanName, cleanPass, cleanTag = map(self.modInput, (username, password, tag))
-        badStr = ""
-        for i,n in enumerate([cleanName, cleanPass, cleanTag]):
+        for n in enumerate([cleanName, cleanPass, cleanTag]):
             if n:
                 pass
             else:
-                if(i == 2):
-                    badStr = badStr + str("\nYour Password Nickname is beyond the characer limit")
-                else:
-                    badStr = badStr + str("\nYour "+vars[i]+" is beyond the characer limit")
-        if(len(badStr) > 0):
-            return badStr
+                return "One or more inputs excede the 64-characer limit"
 
-        rtn = db.insert(cleanTag, cleanName, cleanPass)
+        rtn = self.db.insert(cleanTag, cleanName, cleanPass)
         if(rtn):
             return True
         else:
@@ -96,39 +86,26 @@ class Handler():
         else:
             return "Unexpected Error in Deleting Record"
 
-    def getSecQ(self, username):
-        cleanName = self.modInput(username)
-        if cleanName:
-            return self.db.fetchSQ(cleanName)
-        else:
-            return "Incorrect Username"
-    
-    def checkSecQ(self, username, seqA):
-        # by this point, we know the username is correct
-        cleanName, cleanSecA = map(self.modInput,(username, secA))
-        if cleanSecA:
+    def getEmail(self, user):
+        cleanUser  = self.modInput(user)
+        if cleanUser:
             pass
         else:
-            return "Incorrect Security Question Answer"
-        return self.db.checkSA(cleanName, cleanSecA)
-
+            return "Incorrect Password Username"
+        rtn = self.db.fetchEmail(cleanUser)
+        if rtn == "":
+            return "Could Not Find Username"
+        else:
+            return rtn
 
     def resetPass(self, username, newPass):
-        cleanName, cleanPass = map(self.modInput, (username, password))
-        if n:
-            pass
-        else:
-            return "Your Password Nickname is beyond the characer limit"
-        if self.db.resetpassword(cleanPass):
-            return "Your password has been reset"
-        else:
-            return "Unexpected Error in Password Reset"
-
-
-    vars = {
-        0 : "User Name",
-        1 : "Password",
-        2 : "Security Question",
-        3 : "Security Question Answer",
-    }
-
+        cleanName, cleanPass = map(self.modInput, (username, newPass))
+        for n in enumerate([cleanName, cleanPass]):
+            if n:
+                pass
+            else:
+                return "Your Password Nickname is beyond the characer limit"
+            if self.db.resetpassword(cleanName, cleanPass):
+                return True
+            else:
+                return "Unexpected Error in Password Reset"

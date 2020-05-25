@@ -2,27 +2,53 @@ import tkinter.font as tkFont
 import tkinter
 from tkinter import *
 from handler import *
+from smtpCtrl import *
 
 class VaultApp():
 
     def __init__(self):
         # Main Window layout
         self.handler = Handler()
+        self.currUser = None
+        self.smtp = None
+        self.resetCode = None
         self.loginWindow = tkinter.Tk()
+        self.loginError=None
         self.welcomeWindow = None
         self.registerWindow = None
         self.settingsWindow = None
         self.resetWindow = None
+        self.secresetWindow = None
         self.storeWindow = None
-        self.retrieve = None
+        self.retrieveWindow = None
 
-    def closeWindow(self, win):
+    def openWindow(self, winType, msg=""):
+        win = "self."+winType+"Window"
+        if msg == "":
+            func = "self."+winType.capitalize()+"()"
+        else:
+            func = "self."+winType.capitalize()+"(\""+msg+"\")"
+        if (eval(win)==None):
+            exec(func)
+        else:
+            pass
+
+    def closeWindow(self, winType):
+        win = "self."+winType+"Window"
         if (win == "self.loginWindow") and (self.welcomeWindow != None):
             self.cascadeDestroy()
+        if (win == "self.loginWindow") and (self.registerWindow != None):
+            self.registerWindow.destroy()
+        if (win == "self.loginWindow") and (self.resetWindow != None):
+            self.resetCascadeDestroy()
+        if win == "self.loginWindow":
+            self.currUser = None
+            self.handler.closeDB()
         exec(win +".destroy()")
         exec(win+" = None")
 
     def cascadeDestroy(self):
+        self.currUser = None
         self.welcomeWindow.destroy()
         self.welcomeWindow = None
         if(self.settingsWindow == None):
@@ -35,48 +61,26 @@ class VaultApp():
         else:
             self.storeWindow.destroy()
             self.storeWindow = None
-        if(self.retrieve == None):
+        if(self.retrieveWindow == None):
             pass
         else:
-            self.retrieve.destroy()
-            self.retrieve = None
+            self.retrieveWindow.destroy()
+            self.retrieveWindow = None
         if(self.resetWindow == None):
             pass
         else:
             self.resetWindow.destroy()
             self.resetWindow = None
-
-    def openWindow(self, winType):
-        if winType == "welcome":
-            if(self.welcomeWindow == None):
-                self.Welcome()
-            else:
-                pass
-        if winType == "settings":
-            if(self.settingsWindow == None):
-                self.Settings()
-            else:
-                pass
-        elif winType == "reset":
-            if(self.resetWindow == None):
-                self.Reset()
-            else:
-                pass
-        elif winType == "store":
-            if(self.storeWindow == None):
-                self.Store()
-            else:
-                pass
-        elif winType == "retrieve":
-            if(self.retrieve == None):
-                self.Retrieve()
-            else:
-                pass
-        elif winType == "register":
-            if(self.registerWindow == None):
-                self.Register()
-            else:
-                pass
+    
+    def resetCascadeDestroy(self):
+        self.currUser = None
+        self.resetWindow.destroy()
+        self.resetWindow = None
+        if(self.secresetWindow == None):
+            pass
+        else:
+            self.secresetWindow.destroy()
+            self.secresetWindow = None
 
     def login(self, aName, mPass, erro):
         if (not aName) or (not mPass):
@@ -84,19 +88,93 @@ class VaultApp():
         else:
             rtn = self.handler.login(aName, mPass)
             if isinstance(rtn, bool):
+                self.currUser = aName
+                self.loginError.set("")
                 self.openWindow("welcome")
             else:
                 erro.set(rtn)
 
-    def reg(self, aName, mPass, erro, secQ, seqA):
-        if (not aName) or (not mPass) or (not secQ) or (not seqA):
-            erro.set("Enter all required fields")
+    def reg(self, aName, mPass, email, erro):
+        if (not aName) or (not mPass) or (not email):
+            erro.set("Please Fill All Required Fields")
         else:
-            rtn = self.handler.signup(aName, mPass, secQ, seqA)
+            rtn = self.handler.signUp(aName, mPass, email)
             if isinstance(rtn, bool):
-                self.openWindow("Welcome")
+                self.currUser = aName
+                self.handler.login(aName, mPass)
+                self.closeWindow("register")
+                self.openWindow("welcome", "Congratulations! Registration Complete!")
             else:
                 erro.set(rtn)
+    
+    def getNewCode(self, user):
+        email = self.handler.getEmail(user)
+        self.smtp = SMTPctrl()
+        self.resetCode = self.smtp.getResetCode()
+        self.smtp.sendMail(email, self.currUser)
+    
+    def startPassReset(self, user):
+        self.currUser = user
+        self.getNewCode(user)
+        self.resetWindow.destroy()
+        self.resetWindow=None
+        self.secresetWindow = self.Secreset()
+
+    def resetPass(self, newpass, erro, code=None):
+        if code == None:
+            self.handler.resetPass(self.currUser, newpass)
+            erro.set("Password has been reset!")
+        else:    
+            if code != self.resetCode:
+                erro.set("Incorrect Reset Code")
+            else:
+                rtn = self.handler.resetPass(self.currUser, newpass)
+                if rtn:
+                    self.secresetWindow.destroy()
+                    self.secresetWindow = None
+                    self.loginError.set("Password Reset!")
+                else:
+                    erro.set(rnt)
+
+    def clearStore(self, tag, user, passw, erro):
+        tag.set("")
+        user.set("")
+        passw.set("")
+        erro.set("")
+
+    def storeRec(self, tag, user, passw, erro):
+        Tag, User, Passw = tag.get(), user.get(), passw.get()
+        if (not Tag) or (not User) or (not Passw):
+            erro.set("Please Fill All Required Fields")
+            return
+        else:
+            rtn=self.handler.store(Tag,User,Passw)
+            if isinstance(rtn, bool):
+                tag.set("")
+                user.set("")
+                passw.set("")
+                erro.set("Record Successfully Stored!")
+            else:
+                erro.set(rtn)
+
+    def clearRet(self, tag, record, erro):
+        tag.set("")
+        record.delete('1.0', '5.0')
+        erro.set("")
+
+    def returnRet(self, tag, record, erro):
+        if (not tag):
+            erro.set("Please Enter a Nickname")
+        else:
+            rtn=self.handler.request(tag)
+            if isinstance(rtn, str):
+                erro.set(rtn)
+            else:
+                user=rtn[0]
+                passw=rtn[1]
+                rec = '\n' +str(user)+ '\n\n' +str(passw)
+                record.insert('2.0', rec)
+
 
     def Login(self):
         bgColorMain = "#4CA7B2"
@@ -123,10 +201,10 @@ class VaultApp():
         buttonFrame = Frame(mainFrame, bg=bgColorMain)
         buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
 
-        err = tkFont.Font(family="Arial", weight=tkFont.BOLD, size=14)
-        errorText = tkinter.StringVar()
-        errorText.set("")
-        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#D32600", font=err )
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        self.loginError = tkinter.StringVar()
+        self.loginError.set("")
+        errorLabel = Label(errorFrame, textvariable=self.loginError, bg=bgColorMain, fg="#E8E8E8", font=err )
         errorLabel.pack()
 
         # Labels for entries for login window
@@ -146,7 +224,7 @@ class VaultApp():
 
         # Login button for login window
         loginButton = tkinter.Button(buttonFrame, text="Login", bg=bgColorSub, height=1, width=6,
-                      command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get(), errorText))
+                      command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get(), self.loginError))
         loginButton.pack(side=LEFT, expand=YES, pady=5, padx=5)
         loginButton.configure(relief=RAISED)
         loginButton.pack()
@@ -164,15 +242,15 @@ class VaultApp():
         link.bind("<Button-1>", lambda r: self.openWindow("reset"))
 
         # Closes window using x button
-        self.loginWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.loginWindow"))
+        self.loginWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("login"))
         self.loginWindow.mainloop()
 
-    def Welcome(self):
+    def Welcome(self, msg=""):
         bgColorMain = "#856ff8"
         bgColorSub = "#765EEF"
 
         # Welcome window layout
-        self.welcomeWindow = tkinter.Tk()
+        self.welcomeWindow = Toplevel()
         self.welcomeWindow.title('WELCOME')
         self.welcomeWindow.geometry("600x500+300+150")
 
@@ -189,7 +267,7 @@ class VaultApp():
         # Close welcome window
         filemenu.add_command(label="Log Out", command=self.cascadeDestroy)
         # Exit out of whole app
-        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("self.loginWindow"))
+        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
 
         # Create an Action drop down menu
         actionMenu = Menu(menu_bar, tearoff=0)
@@ -199,22 +277,33 @@ class VaultApp():
         # Retrieve should take you to window that retrieves password
         actionMenu.add_command(label="Retrieve", command=lambda: self.openWindow("retrieve"))
 
+        errorFrame = Frame(self.welcomeWindow)
+        errorFrame.pack(fill="none", expand=False)
+        errorFrame.configure(bg=bgColorMain)
+        errorFrame.pack()
+
         # Create frame for buttons
         buttonFrame = Frame(self.welcomeWindow)
         buttonFrame.pack(fill="none", expand=True)
         buttonFrame.configure(bg=bgColorMain)
         buttonFrame.pack()
 
+        err = tkFont.Font(family="TimesNewRoman", size=20)
+        errorText = tkinter.StringVar()
+        errorText.set(msg)
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+
         # Retrieve button
         retrieveButton = Button(buttonFrame, text="Retrieve", height="2", width="10", command=lambda: self.openWindow("retrieve"))
         retrieveButton.pack(side=LEFT, padx=10)
-        retrieveButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
+        retrieveButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
         retrieveButton.pack()
 
         # Store button
         storeButton = Button(buttonFrame, text="Store", height="2", width="10", command=lambda: self.openWindow("store"))
         storeButton.pack(side=RIGHT, padx=10)
-        storeButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
+        storeButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
         storeButton.pack()
 
         # Closes window using x button
@@ -238,12 +327,12 @@ class VaultApp():
         filemenu = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="File", menu=filemenu)
         # Register information
-        filemenu.add_command(label="Register", command=lambda: self.openWindow("Register"))
+        filemenu.add_command(label="Register", command=lambda: self.openWindow("register"))
         filemenu.add_separator()
         # Close welcome window
-        filemenu.add_command(label="Close", command=lambda: self.closeWindow("self.registerWindow"))
+        filemenu.add_command(label="Close", command=lambda: self.closeWindow("register"))
         # Exit out of whole app
-        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("self.loginWindow"))
+        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
 
         # Create frames
         mainFrame = Frame(self.registerWindow, bg=bgColorMain)
@@ -260,10 +349,10 @@ class VaultApp():
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=20)
         buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
 
-        err = tkFont.Font(family="TimesNewRoman", weight=tkFont.BOLD, size=20)
+        err = tkFont.Font(family="TimesNewRoman", size=18)
         errorText = tkinter.StringVar()
-        errorText.set("ERROR")
-        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#FFFFFF", font=err )
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
 
         # Labels for entries
@@ -272,10 +361,9 @@ class VaultApp():
         userNameLabel.pack(side=TOP, fill=BOTH, pady=10)
         PasswordLabel = Label(labelFrame, text="Password:", bg=bgColorMain, font=times)
         PasswordLabel.pack(side=TOP, fill=BOTH, pady=10)
-        securityQLabel = Label(labelFrame, text="Security Question:", bg=bgColorMain, font=times)
-        securityQLabel.pack(side=TOP, fill=BOTH, pady=10)
-        securityALabel = Label(labelFrame, text="Answer:", bg=bgColorMain, font=times)
-        securityALabel.pack(side=TOP, fill=BOTH, pady=10)
+        emailLabel = Label(labelFrame, text="Email Address:", bg=bgColorMain, font=times)
+        emailLabel.pack(side=TOP, fill=BOTH, pady=10)
+
 
         # User,password, security question, and security answer entry boxes
         userNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
@@ -284,27 +372,25 @@ class VaultApp():
         passwordEntry = Entry(entryFrame, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
         passwordEntry.pack(side=TOP, fill=BOTH, pady=10)
         passwordEntry.configure(highlightbackground= bgColorSub)
-        securityQEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        securityQEntry.pack(side=TOP, fill=BOTH, pady=10)
-        securityQEntry.configure(highlightbackground=bgColorSub)
-        securityAEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        securityAEntry.pack(side=TOP, fill=BOTH, pady=10)
-        securityAEntry.configure(highlightbackground=bgColorSub)
+        emailEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
+        emailEntry.pack(side=TOP, fill=BOTH, pady=10)
+        emailEntry.configure(highlightbackground=bgColorSub)
 
         # Register button
-        registerButton = Button(buttonFrame, text="Register", height="2", width="10")
+        registerButton = Button(buttonFrame, text="Register", height="2", width="10", \
+            command=lambda: self.reg(userNameEntry.get(),passwordEntry.get(),emailEntry.get(),errorText))
         registerButton.pack(side=RIGHT, padx=10)
-        registerButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
+        registerButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
         registerButton.pack()
 
         # Cancel button
-        cancelButton = Button(buttonFrame, text="Cancel", height="2", width="10", command=lambda: self.closeWindow("self.registerWindow"))
+        cancelButton = Button(buttonFrame, text="Cancel", height="2", width="10", command=lambda: self.closeWindow("register"))
         cancelButton.pack(side=LEFT, padx=10)
-        cancelButton.configure(bg=bgColorSub, relief=RAISED, state=ACTIVE)
+        cancelButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
         cancelButton.pack()
 
         # Closes window using x button
-        self.registerWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.registerWindow"))
+        self.registerWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("register"))
         self.registerWindow.mainloop()
 
     def Reset(self):
@@ -325,9 +411,9 @@ class VaultApp():
         menu_bar.add_cascade(label="File", menu=filemenu)
 
         # Close welcome window
-        filemenu.add_command(label="Close", command=lambda: self.closeWindow("self.resetWindow"))
+        filemenu.add_command(label="Close", command=self.resetCascadeDestroy)
         # Exit out of whole app
-        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("self.loginWindow"))
+        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
 
         # Reset Window frames
         mainFrame = Frame(self.resetWindow, bg=bgColorMain)
@@ -353,14 +439,88 @@ class VaultApp():
         accountNameEntry.configure(highlightbackground=bgColorMain)
 
         # Enter button
-        enterButton = tkinter.Button(lowerFrame, text="Enter", height="2", width="10")
+        enterButton = tkinter.Button(lowerFrame, text="Get Reset Code", height="2", width="20", command=lambda: self.startPassReset(accountNameEntry.get()))
         enterButton.pack(side=BOTTOM, expand=YES, pady=5)
         enterButton.configure(bg=bgColorSub)
         enterButton.pack()
 
         # Close window using x button
-        self.resetWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.resetWindow"))
+        self.resetWindow.protocol("WM_DELETE_WINDOW", self.resetCascadeDestroy)
         self.resetWindow.mainloop()
+
+    def Secreset(self):
+        bgColorMain = "#FFF9C4"
+        bgColorSub = "#FFF176"
+
+        # Reset Window layout
+        self.secresetWindow = Toplevel()
+        self.secresetWindow.title('RESET')
+        self.secresetWindow.geometry("400x300")
+
+        # Create a menu bar
+        menu_bar = Menu(self.secresetWindow)
+        self.secresetWindow.config(menu=menu_bar, bg=bgColorMain)
+
+        # Create a File drop down menu
+        filemenu = Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="File", menu=filemenu)
+
+        filemenu.add_command(label="Send New Code")
+        # Close welcome window
+        filemenu.add_command(label="Close", command=lambda: self.closeWindow("reset"))
+        # Exit out of whole app
+        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
+
+        # Reset Window frames
+        mainFrame = Frame(self.secresetWindow, bg=bgColorMain)
+        mainFrame.pack(fill="none", expand=True)
+        mainFrame.pack()
+        errorFrame = Frame(mainFrame, bg=bgColorMain)
+        errorFrame.pack(side=TOP)
+        upperFrame = Frame(mainFrame, bg=bgColorMain)
+        upperFrame.pack(side=TOP, fill="none", expand=False, pady=10)
+        lowerFrame = Frame(mainFrame, bg=bgColorMain)
+        lowerFrame.pack(side=TOP, fill="none", expand=False, pady=5)    
+        labelFrame = Frame(upperFrame, bg=bgColorMain)
+        labelFrame.pack(side=LEFT)
+        boxFrame = Frame(upperFrame, bg=bgColorMain)
+        boxFrame.pack(side=RIGHT)
+
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+
+        # Label for entry
+        times = tkFont.Font(family="TimesNewRoman", size=16)
+        codeLabel = Label(labelFrame, text="Enter Reset Code:", font=times, bg=bgColorMain)
+        codeLabel.pack(side=TOP, fill=BOTH, pady=5)
+        newpassLabel = Label(labelFrame, text="Enter New Password:", font=times, bg=bgColorMain)
+        newpassLabel.pack(side=TOP, fill=BOTH, pady=5)
+
+        # Account name entry box
+        codeEntry = Entry(boxFrame, bd=5, bg=bgColorMain)
+        codeEntry.pack(side=TOP, fill=BOTH, pady=5)
+        codeEntry.configure(highlightbackground=bgColorMain)
+        newpassEntry = Entry(boxFrame, bd=5, bg=bgColorMain)
+        newpassEntry.pack(side=TOP, fill=BOTH, pady=5)
+        newpassEntry.configure(highlightbackground=bgColorMain)
+
+        ## TODO Add functions to buttons
+        # Enter button
+        getnewButton = tkinter.Button(lowerFrame, text="Get New Code", height="2", width="15", command=lambda: self.getNewCode(self.user))
+        getnewButton.pack(side=LEFT, expand=YES, pady=5)
+        getnewButton.configure(bg=bgColorSub)
+        getnewButton.pack()
+        resetButton = tkinter.Button(lowerFrame, text="Reset Password", height="2", width="15", command=lambda: self.resetPass(newpassEntry.get(),errorText,codeEntry.get()))
+        resetButton.pack(side=RIGHT, expand=YES, pady=5)
+        resetButton.configure(bg=bgColorSub)
+        resetButton.pack()
+
+        # Close window using x button
+        self.secresetWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("secreset"))
+        self.secresetWindow.mainloop()
 
     def Store(self):
         bgColorMain = "#BBDEFB"
@@ -369,7 +529,7 @@ class VaultApp():
         # Store Window layout
         self.storeWindow = Toplevel()
         self.storeWindow.title("STORE")
-        self.storeWindow.geometry("500x300+400+150")
+        self.storeWindow.geometry("500x400+400+150")
 
         # Reset Window frames
         mainFrame = Frame(self.storeWindow, bg=bgColorMain)
@@ -386,6 +546,12 @@ class VaultApp():
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=20)
         buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
 
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+
         # Labels
         times = tkFont.Font(family="TimesNewRoman", size=16)
         nickNameLabel = Label(labelFrame, text="Nickname:", bg=bgColorMain, font=times)
@@ -396,25 +562,38 @@ class VaultApp():
         PasswordLabel.pack(side=TOP, fill=BOTH, pady=10)
 
         # Entry boxes
-        nickNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        nickNameEntry.pack(side=TOP, fill=BOTH, pady=5)
+        nickNameText = tkinter.StringVar()
+        nickNameText.set("")
+        nickNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#000000", textvariable=nickNameText)
+        nickNameEntry.pack(side=TOP, fill=BOTH, pady=10)
         nickNameEntry.configure(highlightbackground=bgColorSub)
-        userNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        userNameEntry.pack(side=TOP, fill=BOTH, pady=5)
+        userNameText = tkinter.StringVar()
+        userNameText.set("")
+        userNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#000000", textvariable=userNameText)
+        userNameEntry.pack(side=TOP, fill=BOTH, pady=10)
         userNameEntry.configure(highlightbackground=bgColorSub)
-        passwordEntry = Entry(entryFrame, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
-        passwordEntry.pack(side=TOP, fill=BOTH, pady=5)
+        passwordText = tkinter.StringVar()
+        passwordText.set("")
+        passwordEntry = Entry(entryFrame, bd=4, bg=bgColorSub, show='*', fg="#000000", textvariable=passwordText)
+        passwordEntry.pack(side=TOP, fill=BOTH, pady=10)
         passwordEntry.configure(highlightbackground= bgColorSub)
 
         # Buttons
-        storebutton = Button(buttonFrame, text="Store", bg=bgColorSub, height="2", width="10")
+        clearbutton = Button(buttonFrame, text="Clear", bg=bgColorSub, height="2", width="10",
+            command=lambda: self.clearStore(nickNameText,userNameText,passwordText,errorText))
+        clearbutton.configure(state=NORMAL)
+        clearbutton.pack(side=LEFT, padx=10)
+        storebutton = Button(buttonFrame, text="Store", bg=bgColorSub, height="2", width="10",
+            command=lambda: self.storeRec(nickNameText,userNameText,passwordText, errorText))
+        storebutton.configure(state=NORMAL)
         storebutton.pack(side=RIGHT, padx=10)
-        exitbutton = Button(buttonFrame, text="Exit", height="2", width="10",
-                            command=lambda: self.closeWindow("self.loginWindow"))
-        exitbutton.pack(side=RIGHT, padx=10)
+        # exitbutton = Button(buttonFrame, text="Exit", bg=bgColorSub, height="2", width="10",
+        #     command=lambda: self.closeWindow("login"))
+        # exitbutton.configure(state=NORMAL)
+        # exitbutton.pack(side=RIGHT, padx=10)
 
         # Close window using x button
-        self.storeWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.storeWindow"))
+        self.storeWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("store"))
         self.storeWindow.mainloop()
 
     def Retrieve(self):
@@ -424,7 +603,7 @@ class VaultApp():
         # Store Window layout
         self.retrieveWindow = Toplevel()
         self.retrieveWindow.title("RETRIEVE")
-        self.retrieveWindow.geometry("500x200+400+150")
+        self.retrieveWindow.geometry("500x400+400+150")
 
         # Frames
         mainFrame = Frame(self.retrieveWindow, bg=bgColorMain)
@@ -435,31 +614,55 @@ class VaultApp():
         upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False, pady=20)
         labelFrame = Frame(upperFrame, bg=bgColorMain)
-        labelFrame.pack(side=LEFT, fill="none", expand=False, padx=5)
+        labelFrame.pack(side=LEFT, fill="none", expand=False, padx=5, pady=40)
         entryFrame = Frame(upperFrame, bg=bgColorMain)
         entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=5)
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=20)
-        buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
+        buttonFrame.pack(side=TOP, fill="none", expand=False)
+
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
 
         # Labels
         times = tkFont.Font(family="TimesNewRoman", size=16)
         nickNameLabel = Label(labelFrame, text= "Nickname:", bg=bgColorMain, font=times)
-        nickNameLabel.pack(side=TOP, fill=BOTH, pady=10)
+        nickNameLabel.pack(side=TOP, fill="none", pady=20)
+        recordLabel = Label(labelFrame, text= "Record:", bg=bgColorMain, font=times)
+        recordLabel.pack(side=TOP, fill="none", pady=20)
 
         # Entry boxes
-        nickNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
+        nickNameText = tkinter.StringVar()
+        nickNameText.set("")
+        nickNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#000000", textvariable=nickNameText)
         nickNameEntry.pack(side=TOP, fill=BOTH, pady=5)
         nickNameEntry.configure(highlightbackground=bgColorSub)
 
+        recordScroll = Scrollbar(entryFrame)
+        recordEntry = Text(entryFrame, bd=4, bg=bgColorSub, fg="#000000", state=NORMAL, wrap="word", height=10, width=40)
+        recordEntry.pack(side=TOP, fill="none", pady=5)
+        recordScroll.config(command=recordEntry.yview)
+        recordEntry.config(yscrollcommand=recordScroll.set)
+
+
         # Buttons
-        backButton = Button(buttonFrame, text="Back", bg=bgColorSub, height="2", width="10")
-        backButton.pack(side=LEFT, padx=10)
-        addButton = Button(buttonFrame, text="Add", height="2", width="10")
-        addButton.pack(side=RIGHT, padx=10)
+        clearbutton = Button(buttonFrame, text="Clear", bg=bgColorSub, height="2", width="10",
+            command=lambda: self.clearRet(nickNameText,recordText,errorText))
+        clearbutton.configure(state=NORMAL)
+        clearbutton.pack(side=LEFT, padx=10)
+        # backButton = Button(buttonFrame, text="Back", bg=bgColorSub, height="2", width="10")
+        # backButton.pack(side=LEFT, padx=10)
+        # backButton.configure(state=NORMAL)
+        retrieveButton = Button(buttonFrame, text="Retrieve", bg=bgColorSub, height="2", width="10",
+            command=lambda: self.returnRet(nickNameText.get(),recordEntry,errorText))
+        retrieveButton.pack(side=LEFT, padx=10)
+        retrieveButton.configure(state=NORMAL)
 
         # Close window using x button
-        self.storeWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.retrieveWindow"))
-        self.storeWindow.mainloop()
+        self.retrieveWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("retrieve"))
+        self.retrieveWindow.mainloop()
 
     def Settings(self):
         self.settingsWindow = tkinter.Tk()
@@ -476,7 +679,7 @@ class VaultApp():
         # Close settings window
         filemenu.add_command(label="Log Out", command=self.cascadeDestroy)
         # Exit out of whole app
-        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("self.loginWindow"))
+        filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
 
         # Frames for the settings window
         mainFrame = Frame(self.settingsWindow)
@@ -509,7 +712,7 @@ class VaultApp():
         enterButton.pack()
 
         # Close window using x button
-        self.settingsWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("self.settingsWindow"))
+        self.settingsWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("settings"))
         self.settingsWindow.mainloop()
 
 
