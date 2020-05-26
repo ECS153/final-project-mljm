@@ -601,7 +601,7 @@ class VaultApp():
 
          # Cancel button
         cancelbutton = Button(buttonFrame, text="Cancel", bg=bgColorSub, height="2", width="10",
-            command=lambda: self.closeWindow("login"))
+            command=lambda: self.closeWindow("store"))
         cancelbutton.configure(state=NORMAL)
         cancelbutton.pack(side=LEFT, padx=10)
 
@@ -645,13 +645,12 @@ class VaultApp():
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=20)
         buttonFrame.pack(side=TOP, fill="none", expand=False)
 
+        # Labels
         err = tkFont.Font(family="TimesNewRoman", size=18)
         errorText = tkinter.StringVar()
         errorText.set("")
         errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
-
-        # Labels
         times = tkFont.Font(family="TimesNewRoman", size=16)
         nickNameLabel = Label(labelFrame, text= "Nickname:", bg=bgColorMain, font=times)
         nickNameLabel.pack(side=TOP, fill="none", pady=20)
@@ -671,15 +670,19 @@ class VaultApp():
         recordScroll.config(command=recordEntry.yview)
         recordEntry.config(yscrollcommand=recordScroll.set)
 
+        # Cancel button
+        cancelbutton = Button(buttonFrame, text="Cancel", bg=bgColorSub, height="2", width="10",
+            command=lambda: self.closeWindow("retrieve"))
+        cancelbutton.configure(state=NORMAL)
+        cancelbutton.pack(side=LEFT, padx=10)
 
-        # Buttons
+        # Clear button
         clearbutton = Button(buttonFrame, text="Clear", bg=bgColorSub, height="2", width="10",
-            command=lambda: self.clearRet(nickNameText,recordText,errorText))
+            command=lambda: self.clearRet(nickNameText, recordEntry, errorText))
         clearbutton.configure(state=NORMAL)
         clearbutton.pack(side=LEFT, padx=10)
-        # backButton = Button(buttonFrame, text="Back", bg=bgColorSub, height="2", width="10")
-        # backButton.pack(side=LEFT, padx=10)
-        # backButton.configure(state=NORMAL)
+
+        # Retrieve button
         retrieveButton = Button(buttonFrame, text="Retrieve", bg=bgColorSub, height="2", width="10",
             command=lambda: self.returnRet(nickNameText.get(),recordEntry,errorText))
         retrieveButton.pack(side=LEFT, padx=10)
