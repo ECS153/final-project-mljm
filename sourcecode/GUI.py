@@ -110,8 +110,7 @@ class VaultApp():
     def getNewCode(self, user):
         email = self.handler.getEmail(user)
         self.smtp = SMTPctrl()
-        self.resetCode = self.smtp.getResetCode()
-        self.smtp.sendMail(email, self.currUser)
+        self.resetCode = self.smtp.sendMail(email, self.currUser)
     
     def startPassReset(self, user):
         self.currUser = user
@@ -130,6 +129,7 @@ class VaultApp():
             else:
                 rtn = self.handler.resetPass(self.currUser, newpass)
                 if rtn:
+                    self.resetCode = None
                     self.secresetWindow.destroy()
                     self.secresetWindow = None
                     self.loginError.set("Password Reset!")
