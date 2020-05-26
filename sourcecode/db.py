@@ -83,12 +83,16 @@ class Database():
         except:
             return False
 
-    def registeruser(self, user, phrase, email):
+    def registeruser(self, user, phrase, email, phone, provider):
         if user in self.users:
             print("same username existed")
             return False
         sha1_phrase = self.mycry.SHA1(phrase)
-        self.users[user] = (sha1_phrase, email)
+        epKey = self.calculatekey(sha1_phrase[::-1])
+        email = self.mycry.AES_Encrypt(epKey, email)
+        phone = self.mycry.AES_Encrypt(epKey, phone)
+
+        self.users[user] = (sha1_phrase, email, phone, provider)
         json.dump(self.users, open(self.userinfo, "w+"))
         return True
 
@@ -102,7 +106,7 @@ class Database():
 
         # self.load(self.disk)
         self.user = user
-        (sha1_phrase, email) = self.users[user]
+        (sha1_phrase, email, phone, provider) = self.users[user]
         #calculate encryption/decryption key based on user and phrase here
         self.key = self.calculatekey(sha1_phrase)
         
@@ -180,13 +184,30 @@ class Database():
         return True
     
     def fetchEmail(self, user):
-        # Use email instead of security question to reset master password
+        # Use email to reset master password
         # self.user = user
         if user not in self.users:
-            return ""
-        (sha1_phrase, email) = self.users[user]
-        return email
+            return None
+        (sha1_phrase, email, phone, provider) = self.users[user]
+        epKey = self.calculatekey(sha1_phrase[::-1])
+        try:
+            email = self.mycry.AES_Decrypt(epKey, email)
+            return email
+        except:
+            return None
 
+    def fetchPhone(self, user):
+        # Use phone number to reset master password
+        # Return: phone number and service provider
+        if user not in self.users:
+            return (None, None)
+        (sha1_phrase, email, phone, provider) = self.users[user]
+        epKey = self.calculatekey(sha1_phrase[::-1])
+        try:
+            phone = self.mycry.AES_Decrypt(epKey, phone)
+            return (phone, provider)
+        except:
+            return (None, None)
 
     def fetchSQ(self, user):
         # The user who forget master password should ask for answering security questions
@@ -218,10 +239,21 @@ class Database():
         #and restore them with the new key defined by the new password
         
         # old_key = self.key
-        (old_sha1phrase, email) = self.users[user]
+        (old_sha1phrase, email, phone, provider) = self.users[user]
         old_key = self.calculatekey(old_sha1phrase)
+        old_epKey = self.calculatekey(old_sha1phrase[::-1])
+
         new_sha1phrase = self.mycry.SHA1(new_phrase)
         new_key = self.calculatekey(new_sha1phrase)
+        new_epKey = self.calculatekey(new_sha1phrase[::-1])
+
+        # update encrypted email and phone number
+        email = self.mycry.AES_Decrypt(old_epKey, email)
+        phone = self.mycry.AES_Decrypt(old_epKey, phone)
+        email = self.mycry.AES_Encrypt(new_epKey, email)
+        phone = self.mycry.AES_Encrypt(new_epKey, phone)
+
+
         prefix = ""
         prefix += user + "_"
         password_nicknames = []
@@ -252,7 +284,8 @@ class Database():
             print("added entry, deleted old entry")
             #self.db[nickname] = (old_username, old_password)
         #edit sha1_phrase in userinfo
-        self.users[user] = (new_sha1phrase, email)
+        self.users[user] = (new_sha1phrase, email, phone, provider)
+        
         self.key = new_key
         return True
 

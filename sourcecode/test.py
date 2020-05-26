@@ -3,32 +3,35 @@ from crypt import *
 
 db = Database("./vaultdb")
 
-# print(db.fetchEmail("admin"))
 
-db.registeruser("admin", "pwd123456", "admin@ucdavis.edu")
-if not db.login("admin", "pwd123456"):
+db.registeruser("admin", "123456", "admin@ucdavis.edu", "5302207777", 1)
+if not db.login("admin", "123456"):
     exit()
 
 
-db.insert("boa", "bsdux333", "dasxc32156dv")
-db.insert("boa2", "asdfdvcxv", "32dxcd622165")
-db.insert("google", "baxcxcz", "d15165649595dv")
-db.insert("amazon", "adgfhjtfd", "das51c54vd46asds")
+# db.insert("boa", "bsdux333", "dasxc32156dv")
+# db.insert("boa2", "asdfdvcxv", "32dxcd622165")
+# db.insert("google", "baxcxcz", "d15165649595dv")
+# db.insert("amazon", "adgfhjtfd", "das51c54vd46asds")
 
-print(db.get("boa"))
-print(db.get("boa2"))
-print(db.get("google"))
-print(db.get("amazon"))
+# print(db.get("boa"))
+# print(db.get("boa2"))
+# print(db.get("google"))
+# print(db.get("amazon"))
+print(db.fetchEmail("admin"))
+print(db.fetchPhone("admin"))
 
 db.resetpassword("admin", "password")
 print("master password changed")
+print(db.fetchEmail("admin"))
+print(db.fetchPhone("admin"))
 #db.close()
 # if not db.login("admin", "password"):
 #    exit()
 
-print(db.get("boa2"))
-print(db.get("google"))
-print(db.get("amazon"))
+# print(db.get("boa2"))
+# print(db.get("google"))
+# print(db.get("amazon"))
 
 
 # (a,b) = db.get(mycry.AES_Encrypt(key, "boa"))
