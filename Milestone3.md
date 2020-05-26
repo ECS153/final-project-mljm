@@ -16,4 +16,6 @@
 
 ## Design Doc
 
- - [Milestone 3 Design Doc]()
+ - [Milestone 3 Design Doc (1)](https://drive.google.com/open?id=1DTKZAFvdfNq2dDvrBXXAKG1-meygyvQkRtnXiMniDLM)
+ - [Milestone 3 Design Doc (2)]()
+
