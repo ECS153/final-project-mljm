@@ -95,11 +95,11 @@ class VaultApp():
             else:
                 erro.set(rtn)
 
-    def reg(self, aName, mPass, email, erro):
-        if (not aName) or (not mPass) or (not email):
-            erro.set("Please Fill All Required Fields")
+    def reg(self, aName, mPass, email, phone, prov, erro):
+        if (not aName) or (not mPass) or (not email) or (not phone) or (prov == "Select Phone Provider"):
+            erro.set("Please Fill In All Required Fields")
         else:
-            rtn = self.handler.signUp(aName, mPass, email)
+            rtn = self.handler.signUp(aName, mPass, email, phone, prov)
             if isinstance(rtn, bool):
                 self.currUser = aName
                 self.handler.login(aName, mPass)
@@ -401,7 +401,7 @@ class VaultApp():
 
         # Register button
         registerButton = Button(buttonFrame, text="Register", height="2", width="10",
-            command=lambda: self.reg(userNameEntry.get(),passwordEntry.get(),emailEntry.get(),errorText))
+            command=lambda: self.reg(userNameEntry.get(),passwordEntry.get(),emailEntry.get(),phoneEntry.get(),providerText.get(),errorText))
         registerButton.pack(side=RIGHT, padx=10)
         registerButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
 

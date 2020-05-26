@@ -12,26 +12,47 @@ class Handler():
             return str(var)
         else:
             return False
+    
+    def getProvider(self, prov):
+        if prov == "AT&T":
+            return 1
+        elif prov == "Sprint":
+            return 2
+        elif prov == "TMobile":
+            return 3
+        elif prov == "Verizon":
+            return 4
+        elif prov == "Boost":
+            return 5
+        elif prov == "Cricket":
+            return 6
+        elif prov == "MetroPCS":
+            return 7
+        elif prov == "Virgin Mobile":
+            return 8
+        else:
+            return 0
 
     def closeDB(self):
         self.db.close()
 
-    def signUp(self, username, password, email):
+    def signUp(self, username, password, email, phone, provider):
         # Check size of inputs and ensure they are strings
-        cleanName, cleanPass, cleanEmail = map(self.modInput, (username, password, email))
+
+        cleanName, cleanPass, cleanEmail, cleanPhone= map(self.modInput, (username, password, email, phone))
         # Check the output of the modifications
-        for n in enumerate([cleanName, cleanPass, cleanEmail]):
+        for n in enumerate([cleanName, cleanPass, cleanEmail, cleanPhone]):
             if n:
                 pass
             else:
                 return "One or more inputs excede the 64-characer limit"
         
         # If all is good, register user
-        rtn = self.db.registeruser(cleanName, cleanPass, cleanEmail)
+        rtn = self.db.registeruser(cleanName, cleanPass, cleanEmail, cleanPhone, self.getProvider(provider))
         # If registration occurs correctly, return True,
-        # else, return an error message
         if(rtn):
             return True
+        # else, return an error message
         else:
             return "Please Choose a different Account Name"
 
