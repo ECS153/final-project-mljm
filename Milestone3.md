@@ -3,7 +3,7 @@
 ## Meeting Notes
 
 - [Meeting 5/22](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200522.md)
-- [Meeting 5/26]()
+- [Meeting 5/26](https://github.com/ECS153/final-project-mljm/blob/master/Meeting/Meeting%200526.md)
 ## Commits
 
 - [Commits to Master](https://github.com/ECS153/final-project-mljm/commits/master)
