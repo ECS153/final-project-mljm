@@ -89,6 +89,8 @@ class VaultApp():
         else:
             rtn = self.handler.login(aName, mPass)
             if isinstance(rtn, bool):
+                if self.welcomeWindow != None:
+                    self.cascadeDestroy()
                 self.currUser = aName
                 self.loginError.set("")
                 self.openWindow("welcome")

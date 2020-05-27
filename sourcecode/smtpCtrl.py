@@ -9,11 +9,10 @@ class SMTPctrl():
     
     def sendMail(self, recip, user):
         resetCode = secrets.token_urlsafe(15)
-        msg = self.resetEmailMsg(user)
         with smtplib.SMTP('smtp.gmail.com:587') as controller:
             controller.starttls()
             controller.login(self.account, self.mpass)
-            controller.sendmail(self.account, recip, msg)
+            controller.sendmail(self.account, recip, self.resetEmailMsg(user, resetCode))
             controller.quit()
         return resetCode
 
@@ -23,7 +22,7 @@ class SMTPctrl():
         with smtplib.SMTP('smtp.gmail.com:587') as controller:
             controller.starttls()
             controller.login(self.account, self.mpass)
-            controller.sendmail(self.account,sendAddr,self.resetSMSMsg(user))
+            controller.sendmail(self.account,sendAddr,self.resetSMSMsg(user, resetCode))
             controller.quit()
         return resetCode
 
