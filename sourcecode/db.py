@@ -289,6 +289,24 @@ class Database():
         self.key = new_key
         return True
 
+    def resetEmail(self, new_email):
+        # Change the email after logged in
+        (sha1phrase, email, phone, provider) = self.users[self.user]
+        epKey = self.calculatekey(sha1phrase[::-1])
+        new_email = self.mycry.AES_Encrypt(epKey, new_email)
+        self.users[self.user] = (sha1phrase, new_email, phone, provider)
+        return True
+    
+    def resetPhone(self, new_phone, new_provider):
+        # Change the phone number and service provider after logged in
+        (sha1phrase, email, phone, provider) = self.users[self.user]
+        epKey = self.calculatekey(sha1phrase[::-1])
+        new_phone = self.mycry.AES_Encrypt(epKey, new_phone)
+        self.users[self.user] = (sha1phrase, email, new_phone, new_provider)
+        return True
+
+    
+
 
 
 

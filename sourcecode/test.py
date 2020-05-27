@@ -20,9 +20,10 @@ if not db.login("admin", "123456"):
 # print(db.get("amazon"))
 print(db.fetchEmail("admin"))
 print(db.fetchPhone("admin"))
-
-db.resetpassword("admin", "password")
-print("master password changed")
+db.resetEmail("xxx@ucdavis.edu")
+db.resetPhone("2331223456", 1)
+# db.resetpassword("admin", "password")
+# print("master password changed")
 print(db.fetchEmail("admin"))
 print(db.fetchPhone("admin"))
 #db.close()
