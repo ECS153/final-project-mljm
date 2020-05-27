@@ -12,7 +12,7 @@
 
 ## Milestone Video
 
-- [Milestone 3 Video]()
+- [Milestone 3 Video](https://github.com/ECS153/final-project-mljm/blob/master/MS3.mp4)
 
 ## Design Doc
 
