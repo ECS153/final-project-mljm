@@ -417,7 +417,7 @@ class VaultApp():
         self.registerWindow.mainloop()
 
     def Reset(self):
-        bgColorMain = "#FFF9C4"
+        bgColorMain = "#F2D98C"
         bgColorSub = "#FFF176"
 
         # Reset Window layout
@@ -463,12 +463,12 @@ class VaultApp():
 
         # Enter button
         enterButton = tkinter.Button(buttonFrame, text="Get Reset Code", height="2", width="14", command=lambda: self.startPassReset(accountNameEntry.get()))
-        enterButton.pack(side=TOP, expand=YES, pady=5)
+        enterButton.pack(side=RIGHT, expand=YES, pady=5, padx=5)
         enterButton.configure(bg=bgColorSub)
 
         # Cancel button
         cancelButton = Button(buttonFrame, text="Cancel", height="2", width="8", command=lambda: self.closeWindow("reset"))
-        cancelButton.pack(side=BOTTOM, pady=5)
+        cancelButton.pack(side=LEFT, pady=5, padx=5)
         cancelButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
 
         # Closes window using x button
@@ -547,8 +547,8 @@ class VaultApp():
         self.secresetWindow.mainloop()
 
     def Store(self):
-        bgColorMain = "#BBDEFB"
-        bgColorSub = "#4FC3F7"
+        bgColorMain = "#89BFF5"
+        bgColorSub = "#8FBFEF"
 
         # Store Window layout
         self.storeWindow = Toplevel()
@@ -695,54 +695,100 @@ class VaultApp():
         self.retrieveWindow.mainloop()
 
     def Settings(self):
-        bgColorMain = "#FFAB91"
-        bgColorSub = "#FFAB91"
+        bgColorMain = "#B3DD88"
+        bgColorSub = "#B3D98C"
 
-        self.settingsWindow = tkinter.Tk()
+        self.settingsWindow = Toplevel()
         self.settingsWindow.title('Settings')
-        self.settingsWindow.geometry("600x500")
+        self.settingsWindow.geometry("700x650+400+150")
 
-        # Create a menu bar in settings window
+        # Menu bar in settings window
         menu_bar = Menu(self.settingsWindow)
         self.settingsWindow.config(menu=menu_bar)
 
-        # Create a File drop down menu in settings window
+        # Creates a File drop down menu in settings window
         filemenu = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="File", menu=filemenu)
-        # Close settings window
+        # Closes settings window
         filemenu.add_command(label="Log Out", command=self.cascadeDestroy)
-        # Exit out of whole app
+        # Exits out of whole app
         filemenu.add_command(label="Exit", command=lambda: self.closeWindow("login"))
 
-        # Frames for the settings window
-        mainFrame = Frame(self.settingsWindow)
-        mainFrame.pack(fill="none", expand=True)
-        upperFrame = Frame(mainFrame)
+        # Frames
+        mainFrame = Frame(self.settingsWindow, bg=bgColorMain)
+        mainFrame.pack(fill=BOTH, expand=True)
+        upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False)
-        labelFrame = Frame(upperFrame)
-        labelFrame.pack(side=LEFT)
-        entryFrame = Frame(upperFrame, bg=bgColorMain)
-        entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=5)
-        buttonFrame = Frame(mainFrame)
-        buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
+        bottomFrame = Frame(mainFrame, bg=bgColorMain)
+        bottomFrame.pack(side=TOP, fill="none", expand=False)
+        labelFrame = Frame(bottomFrame, bg=bgColorMain)
+        labelFrame.pack(side=LEFT, fill="none", expand=False)
+        entryFrame = Frame(bottomFrame, bg=bgColorMain)
+        entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=5, pady=15)
+        passwordFrame = Frame(entryFrame, bg=bgColorMain)
+        passwordFrame.pack(side=TOP, fill="none", expand=False, pady=20)
+        emailFrame = Frame(entryFrame, bg=bgColorMain)
+        emailFrame.pack(side=TOP, fill="none", expand=False, pady=25)
+        phoneFrame = Frame(entryFrame, bg=bgColorMain)
+        phoneFrame.pack(side=TOP, fill="none", expand=False, pady=25)
+        providerFrame = Frame(entryFrame, bg=bgColorMain)
+        providerFrame.pack(side=TOP, fill="none", expand=False, pady=20)
 
-        # Labels for entries in settings window
-        times = tkFont.Font(family="TimesNewRoman", size=14)
-        accountNameLabel = Label(labelFrame, text="Enter new Account Name:", font=times)
-        accountNameLabel.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordLabel = Label(labelFrame, text="Enter new Master Password:", font=times)
-        masterPasswordLabel.pack(side=BOTTOM, fill=BOTH, pady=5)
+        # Labels
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(upperFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+        times = tkFont.Font(family="TimesNewRoman", size=18)
+        masterPasswordLabel = Label(labelFrame, text="Enter new Master Password:", bg=bgColorMain, font=times)
+        masterPasswordLabel.pack(side=TOP, fill=BOTH, pady=40)
+        newEmailLabel = Label(labelFrame, text="Enter new email:", bg=bgColorMain, font=times)
+        newEmailLabel.pack(side=TOP, fill=BOTH, pady=40)
+        phoneNumberLabel = Label(labelFrame, text="Enter new phone number:", bg=bgColorMain, font=times)
+        phoneNumberLabel.pack(side=TOP, fill=BOTH, pady=40)
+        newProviderLabel = Label(labelFrame, text="Enter new provider:", bg=bgColorMain, font=times)
+        newProviderLabel.pack(side=TOP, fill=BOTH, pady=40)
 
-        # User and password entry boxes in settings window
-        accountNameEntry = Entry(entryFrame, bd=5)
-        accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
-        masterPasswordEntry = Entry(entryFrame, bd=5, show='*')
-        masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
+        # Entry boxes
+        masterPasswordEntry = Entry(passwordFrame, bd=5, show='*', bg=bgColorSub)
+        masterPasswordEntry.configure(highlightbackground=bgColorSub)
+        masterPasswordEntry.pack(side=TOP, fill=BOTH, pady=5)
+        newEmailEntry = Entry(emailFrame, bd=5, bg=bgColorSub, fg=bgColorSub)
+        newEmailEntry.configure(highlightbackground=bgColorSub)
+        newEmailEntry.pack(side=TOP, fill=BOTH, pady=5)
+        phoneNumberEntry = Entry(phoneFrame, bd=5, bg=bgColorSub, fg=bgColorSub)
+        phoneNumberEntry.configure(highlightbackground=bgColorSub)
+        phoneNumberEntry.pack(side=TOP, fill=BOTH, pady=5)
 
-        # Login button in settings window
-        enterButton = tkinter.Button(mainFrame, text="Enter")
-        enterButton.pack(side=BOTTOM, expand=YES, pady=5)
-        enterButton.pack()
+        providerText = tkinter.StringVar()
+        providerText.set("Select Phone Provider")
+        providerEntry = Menubutton(providerFrame, textvariable=providerText, relief=FLAT)
+        providerEntry.pack(side=TOP, fill=BOTH, pady=5)
+        providerEntry.menu = Menu(providerEntry, tearoff=0)
+        providerEntry["menu"] = providerEntry.menu
+        providerEntry.menu.add_checkbutton(label="AT&T", variable=IntVar(), command= lambda: providerText.set("AT&T"))
+        providerEntry.menu.add_checkbutton(label="Sprint", variable=IntVar(), command= lambda: providerText.set("Sprint"))
+        providerEntry.menu.add_checkbutton(label="TMobile", variable=IntVar(), command= lambda: providerText.set("TMobile"))
+        providerEntry.menu.add_checkbutton(label="Verizon", variable=IntVar(), command= lambda: providerText.set("Verizon"))
+        providerEntry.menu.add_checkbutton(label="Boost", variable=IntVar(), command= lambda: providerText.set("Boost"))
+        providerEntry.menu.add_checkbutton(label="Cricket", variable=IntVar(), command= lambda: providerText.set("Cricket"))
+        providerEntry.menu.add_checkbutton(label="MetroPCS", variable=IntVar(), command= lambda: providerText.set("MetroPCS"))
+        providerEntry.menu.add_checkbutton(label="Virgin Mobile", variable=IntVar(), command= lambda: providerText.set("Virgin Mobile"))
+
+        # Change buttons
+        changePasswordButton = tkinter.Button(passwordFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changePasswordButton.configure(relief=RAISED, state=NORMAL)
+        changePasswordButton.pack(side=BOTTOM, expand=YES, pady=5)
+        changeEmailButton = tkinter.Button(emailFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changeEmailButton.configure(relief=RAISED, state=NORMAL)
+        changeEmailButton.pack(side=BOTTOM, expand=YES, pady=5)
+        changePhoneButton = tkinter.Button(phoneFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changePhoneButton.configure(relief=RAISED, state=NORMAL)
+        changePhoneButton.pack(side=BOTTOM, expand=YES, pady=5)
+        changeProviderButton = tkinter.Button(providerFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changeProviderButton.configure(relief=RAISED, state=NORMAL)
+        changeProviderButton.pack(side=TOP, expand=YES, pady=5)
 
         # Closes window using x button
         self.settingsWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("settings"))
@@ -751,5 +797,3 @@ class VaultApp():
 
 start = VaultApp()
 start.Login()
-
-#TEST
