@@ -270,6 +270,7 @@ class VaultApp():
         link.pack(side=BOTTOM, expand=YES)
         link.bind("<Button-1>", lambda r: self.openWindow("reset"))
 
+        self.loginWindow.bind('<Return>', lambda event=None: loginButton.invoke())
         # Closes window using x button
         self.loginWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("login"))
         self.loginWindow.mainloop()
@@ -447,6 +448,7 @@ class VaultApp():
         cancelButton.pack(side=LEFT, padx=10)
         cancelButton.configure(relief=RAISED, state=NORMAL)
 
+        self.registerWindow.bind('<Return>', lambda event=None: registerButton.invoke())
         # Closes window using x button
         self.registerWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("register"))
         self.registerWindow.mainloop()
@@ -584,10 +586,10 @@ class VaultApp():
 
         # Enter button
         getnewButton = tkinter.Button(lowerFrame, text="Get New Code", height="2", width="15", command=lambda: self.getNewCode(self.user))
-        getnewButton.pack(side=LEFT, expand=YES, pady=5)
+        getnewButton.pack(side=LEFT, expand=YES, pady=5, padx=10)
 
         resetButton = tkinter.Button(lowerFrame, text="Reset Password", height="2", width="15", command=lambda: self.resetPass(newpassEntry.get(),errorText,codeEntry.get()))
-        resetButton.pack(side=RIGHT, expand=YES, pady=5)
+        resetButton.pack(side=RIGHT, expand=YES, pady=5, padx=10)
 
 
         # Closes window using x button
@@ -667,6 +669,7 @@ class VaultApp():
         storebutton.configure(state=NORMAL)
         storebutton.pack(side=RIGHT, padx=10)
 
+        self.storeWindow.bind('<Return>', lambda event=None: storebutton.invoke())
         # Closes window using x button
         self.storeWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("store"))
         self.storeWindow.mainloop()
@@ -738,6 +741,7 @@ class VaultApp():
         retrieveButton.pack(side=LEFT, padx=10)
         retrieveButton.configure(state=NORMAL)
 
+        self.retrieveWindow.bind('<Return>', lambda event=None: retrieveButton.invoke())
         # Closes window using x button
         self.retrieveWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("retrieve"))
         self.retrieveWindow.mainloop()
@@ -750,7 +754,6 @@ class VaultApp():
         self.settingsWindow = Toplevel()
         self.settingsWindow.title('Settings')
         self.settingsWindow.geometry("580x550+400+200")
-        padd = 5
         framewidth = 50
 
         # Menu bar in settings window
@@ -771,18 +774,18 @@ class VaultApp():
         errorFrame = Frame(mainFrame, bg=bgColorMain)
         errorFrame.pack(side=TOP, fill="none", expand=False)
 
-        passFrame = LabelFrame(mainFrame, text="Change Master Password", bg=bgColorMain)
-        passFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        passFrame = LabelFrame(mainFrame, bg=bgColorMain)
+        passFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5)
         passbuttonFrame = Frame(passFrame, bg=bgColorMain)
         passbuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
 
-        emailFrame = LabelFrame(mainFrame,text="Change Email", bg=bgColorMain)
-        emailFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        emailFrame = LabelFrame(mainFrame, bg=bgColorMain)
+        emailFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5)
         mailbuttonFrame = Frame(emailFrame, bg=bgColorMain)
         mailbuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
 
-        phoneFrame = LabelFrame(mainFrame,text="Change Phone Info", bg=bgColorMain)
-        phoneFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        phoneFrame = LabelFrame(mainFrame, bg=bgColorMain)
+        phoneFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5)
         phonebuttonFrame = Frame(phoneFrame, bg=bgColorMain)
         phonebuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
         
@@ -796,30 +799,30 @@ class VaultApp():
         times = tkFont.Font(family="TimesNewRoman", size=18)
 
         masterPasswordLabel = Label(passFrame, text="Enter new Master Password:", bg=bgColorMain, font=times)
-        masterPasswordLabel.pack(side=LEFT, fill="none", expand=True, pady=padd)
+        masterPasswordLabel.pack(side=LEFT, fill="none", expand=True, pady=5)
 
-        newEmailLabel = Label(emailFrame, text="Enter new email:", bg=bgColorMain, font=times)
-        newEmailLabel.pack(side=LEFT, fill="none", expand=True, pady=padd)
+        newEmailLabel = Label(emailFrame, text="Enter New Email Address:", bg=bgColorMain, font=times)
+        newEmailLabel.pack(side=LEFT, fill="none", expand=True, pady=5)
 
         phoneLabelFrame = Frame(phoneFrame, bg=bgColorMain)
         phoneLabelFrame.pack(side=LEFT, fill=BOTH, expand=True)
-        phoneNumberLabel = Label(phoneLabelFrame, text="Enter new phone number:", bg=bgColorMain, font=times)
-        phoneNumberLabel.pack(side=TOP, fill="none", pady=padd)
-        newProviderLabel = Label(phoneLabelFrame, text="Enter new provider:", bg=bgColorMain, font=times)
-        newProviderLabel.pack(side=TOP, fill="none", pady=padd)
+        phoneNumberLabel = Label(phoneLabelFrame, text="Enter New Phone Number:", bg=bgColorMain, font=times)
+        phoneNumberLabel.pack(side=TOP, fill="none", pady=5)
+        newProviderLabel = Label(phoneLabelFrame, text="Enter New Cell Provider:", bg=bgColorMain, font=times)
+        newProviderLabel.pack(side=TOP, fill="none", pady=5)
 
         # Entry boxes
         mPassText = tkinter.StringVar()
         mPassText.set("")
         masterPasswordEntry = Entry(passFrame, bd=5, show='*', bg=bgColorSub, textvariable=mPassText, fg="#000000")
         masterPasswordEntry.configure(highlightbackground=bgColorSub)
-        masterPasswordEntry.pack(side=RIGHT, fill="none", expand=True, pady=padd)
+        masterPasswordEntry.pack(side=RIGHT, fill="none", expand=True, pady=5)
 
         mailText = tkinter.StringVar()
         mailText.set("")
         newEmailEntry = Entry(emailFrame, bd=5, bg=bgColorSub, textvariable=mailText,fg="#000000")
         newEmailEntry.configure(highlightbackground=bgColorSub)
-        newEmailEntry.pack(side=RIGHT, fill="none", expand=True, pady=padd)
+        newEmailEntry.pack(side=RIGHT, fill="none", expand=True, pady=5)
 
         numText = tkinter.StringVar()
         numText.set("")
@@ -827,11 +830,11 @@ class VaultApp():
         phoneEntryFrame.pack(side=RIGHT, fill="none", expand=True)
         phoneNumberEntry = Entry(phoneEntryFrame, bd=5, bg=bgColorSub, textvariable=numText,fg="#000000")
         phoneNumberEntry.configure(highlightbackground=bgColorSub)
-        phoneNumberEntry.pack(side=TOP, fill="none", expand=True, pady=padd)
+        phoneNumberEntry.pack(side=TOP, fill="none", expand=True, pady=5)
         providerText = tkinter.StringVar()
         providerText.set("Select Phone Provider")
-        providerEntry = Menubutton(phoneEntryFrame, textvariable=providerText, relief=FLAT)
-        providerEntry.pack(side=TOP, fill="none", expand=True, pady=padd)
+        providerEntry = Menubutton(phoneEntryFrame, textvariable=providerText, relief=FLAT, width=20)
+        providerEntry.pack(side=TOP, fill="none", expand=True, pady=5)
         providerEntry.menu = Menu(providerEntry, tearoff=0)
         providerEntry["menu"] = providerEntry.menu
         providerEntry.menu.add_checkbutton(label="AT&T", variable=IntVar(), command= lambda: providerText.set("AT&T"))
@@ -872,17 +875,17 @@ class VaultApp():
         changePasswordButton = tkinter.Button(passbuttonFrame, text="Change Password", height="1", width="15",
             command=lambda: changePass(mPassText,errorText))
         changePasswordButton.configure(relief=RAISED, state=NORMAL)
-        changePasswordButton.pack(side=TOP, pady=padd)
+        changePasswordButton.pack(side=TOP, pady=5)
 
         changeEmailButton = tkinter.Button(mailbuttonFrame, text="Change Email", height="1", width="15",
             command=lambda: changeEmail(mailText,errorText))
         changeEmailButton.configure(relief=RAISED, state=NORMAL)
-        changeEmailButton.pack(side=TOP, pady=padd)
+        changeEmailButton.pack(side=TOP, pady=5)
 
         changePhoneButton = tkinter.Button(phonebuttonFrame, text="Change Phone Info", height="1", width="15",
             command=lambda: changePhone(numText,providerText,errorText))
         changePhoneButton.configure(relief=RAISED, state=NORMAL)
-        changePhoneButton.pack(side=TOP, pady=padd)
+        changePhoneButton.pack(side=TOP, pady=5)
 
         # Closes window using x button
         self.settingsWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("settings"))
