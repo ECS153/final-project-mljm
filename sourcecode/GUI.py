@@ -208,7 +208,7 @@ class VaultApp():
 
         # Login Window layout
         self.loginWindow.title('THE VAULT')
-        self.loginWindow.geometry("650x300+400+300")
+        self.loginWindow.geometry("650x300+800+300")
         self.loginWindow.configure(bg=bgColorMain)
 
         # Frames for Login window
@@ -286,7 +286,7 @@ class VaultApp():
         # Welcome window layout
         self.welcomeWindow = Toplevel()
         self.welcomeWindow.title('WELCOME')
-        self.welcomeWindow.geometry("1000x600+300+150")
+        self.welcomeWindow.geometry("1000x600+750+250")
 
         # Menu bar
         menu_bar = Menu(self.welcomeWindow)
@@ -356,7 +356,7 @@ class VaultApp():
         # Register window layout
         self.registerWindow = Toplevel()
         self.registerWindow.title('REGISTER')
-        self.registerWindow.geometry("550x450+400+200")
+        self.registerWindow.geometry("550x450+750+250")
 
         # Menu bar
         menu_bar = Menu(self.registerWindow)
@@ -460,7 +460,7 @@ class VaultApp():
         # Reset Window layout
         self.resetWindow = Toplevel()
         self.resetWindow.title('RESET')
-        self.resetWindow.geometry("450x300")
+        self.resetWindow.geometry("450x300+800+300")
 
         # Menu bar
         menu_bar = Menu(self.resetWindow)
@@ -533,7 +533,7 @@ class VaultApp():
         # Reset Window layout
         self.secresetWindow = Toplevel()
         self.secresetWindow.title('RESET')
-        self.secresetWindow.geometry("500x350")
+        self.secresetWindow.geometry("500x350+800+300")
 
         # Menu bar
         menu_bar = Menu(self.secresetWindow)
@@ -603,7 +603,7 @@ class VaultApp():
         # Store Window layout
         self.storeWindow = Toplevel()
         self.storeWindow.title("STORE")
-        self.storeWindow.geometry("500x400+400+150")
+        self.storeWindow.geometry("500x400+800+300")
 
         # Window frames
         mainFrame = Frame(self.storeWindow, bg=bgColorMain)
@@ -681,7 +681,7 @@ class VaultApp():
         # Store Window layout
         self.retrieveWindow = Toplevel()
         self.retrieveWindow.title("RETRIEVE")
-        self.retrieveWindow.geometry("500x400+400+150")
+        self.retrieveWindow.geometry("500x400+800+300")
 
         # Frames
         mainFrame = Frame(self.retrieveWindow, bg=bgColorMain)
@@ -753,7 +753,7 @@ class VaultApp():
 
         self.settingsWindow = Toplevel()
         self.settingsWindow.title('Settings')
-        self.settingsWindow.geometry("580x550+400+200")
+        self.settingsWindow.geometry("580x550+770+270")
         framewidth = 50
 
         # Menu bar in settings window
