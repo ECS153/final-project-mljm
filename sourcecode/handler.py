@@ -5,10 +5,27 @@ class Handler():
         self.db = Database("./vaultdb")
         self.charLimit = 64
         self.charMin = 4
+        self.phoneLimit = 10
 
 
     def modInput(self, var):
-        if (len(str(var)) < self.charLimit) and (len(str(var)) >= self.charMin):
+        if (len(str(var)) <= self.charLimit) and (len(str(var)) >= self.charMin):
+            return str(var)
+        else:
+            return False
+            
+    def modPhone(self, var):
+        try:
+            int(var)
+        except:
+            return False
+        if (len(var) == self.phoneLimit):
+            return str(var)
+        else:
+            return False
+    
+    def modEmail(self, var):
+        if ((len(str(var)) <= self.charLimit) and (str(var).find('@') != -1) and (str(var).find('.') != -1)):
             return str(var)
         else:
             return False
@@ -38,14 +55,20 @@ class Handler():
 
     def signUp(self, username, password, email, phone, provider):
         # Check size of inputs and ensure they are strings
-
-        cleanName, cleanPass, cleanEmail, cleanPhone= map(self.modInput, (username, password, email, phone))
+        cleanName, cleanPass = map(self.modInput, (username, password))
+        cleanEmail = self.modEmail(email)
+        cleanPhone = self.modPhone(phone)
         # Check the output of the modifications
-        for n in enumerate([cleanName, cleanPass, cleanEmail, cleanPhone]):
-            if n:
+        for k,val in enumerate([cleanName, cleanPass, cleanEmail, cleanPhone]):
+            if val:
                 pass
             else:
-                return "One or more inputs excede the 64-characer limit"
+                if k==0 or k==1:
+                    return "Username and Password must be between 4 and 64 characters"
+                elif k == 2:
+                    return "Please enter a valid email"
+                else:
+                    return "Please enter a valid Phone Number"
         
         # If all is good, register user
         rtn = self.db.registeruser(cleanName, cleanPass, cleanEmail, cleanPhone, self.getProvider(provider))
@@ -75,7 +98,7 @@ class Handler():
             if n:
                 pass
             else:
-                return "One or more inputs excede the 64-characer limit"
+                return "One or more inputs do not meet the 4-64 character range"
 
         rtn = self.db.insert(cleanTag, cleanName, cleanPass)
         if(rtn):
@@ -114,7 +137,19 @@ class Handler():
         else:
             return "Incorrect Password Username"
         rtn = self.db.fetchEmail(cleanUser)
-        if rtn == "":
+        if rtn == None:
+            return "Could Not Find Username"
+        else:
+            return rtn
+    
+    def getPhone(self, user):
+        cleanUser  = self.modInput(user)
+        if cleanUser:
+            pass
+        else:
+            return "Incorrect Password Username"
+        rtn = self.db.fetchPhone(cleanUser)
+        if rtn[0] == None:
             return "Could Not Find Username"
         else:
             return rtn
@@ -125,8 +160,30 @@ class Handler():
             if n:
                 pass
             else:
-                return "Your Password Nickname is beyond the characer limit"
+                return "Your Password must be between 4 and 64 characters"
             if self.db.resetpassword(cleanName, cleanPass):
                 return True
             else:
                 return "Unexpected Error in Password Reset"
+    
+    def resetEmail(self, email):
+        cleanEmail = self.modEmail(email)
+        if cleanEmail:
+            pass
+        else:
+            return "Please enter a valid email"
+        if self.db.resetEmail(cleanEmail):
+            return True
+        else:
+            return "Unexpected Error in Email Reset"
+    
+    def resetPhone(self, phone, prov):
+        cleanPhone = self.modEmail(phone)
+        if cleanPhone:
+            pass
+        else:
+            return "Please enter valid Phone information"
+        if self.db.resetPhone(cleanPhone, self.getProvider(prov)):
+            return True
+        else:
+            return "Unexpected Error in Phone Number Reset"

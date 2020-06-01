@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import Text
 from handler import *
 from smtpCtrl import *
+from PIL import Image, ImageTk
 
 class VaultApp():
 
@@ -84,16 +85,20 @@ class VaultApp():
             self.secresetWindow = None
 
     def login(self, aName, mPass, erro):
-        if (not aName) or (not mPass):
+        name = aName.get()
+        pas = mPass.get()
+        if (not name) or (not pas):
             erro.set("Enter an Account Name and Password")
         else:
-            rtn = self.handler.login(aName, mPass)
+            rtn = self.handler.login(name, pas)
             if isinstance(rtn, bool):
                 if self.welcomeWindow != None:
                     self.cascadeDestroy()
-                self.currUser = aName
+                self.currUser = name
+                aName.set("")
+                mPass.set("")
                 self.loginError.set("")
-                self.openWindow("welcome")
+                self.openWindow("welcome", "Welcome To The Vault")
             else:
                 erro.set(rtn)
 
@@ -110,17 +115,36 @@ class VaultApp():
             else:
                 erro.set(rtn)
     
-    def getNewCode(self, user):
-        email = self.handler.getEmail(user)
-        self.smtp = SMTPctrl()
-        self.resetCode = self.smtp.sendMail(email, self.currUser)
-    
-    def startPassReset(self, user):
-        self.currUser = user
-        self.getNewCode(user)
-        self.resetWindow.destroy()
-        self.resetWindow=None
-        self.secresetWindow = self.Secreset()
+    def getNewCode(self, user, byway):
+        if byway == 'phone':
+            phoneInfo = self.handler.getPhone(user)
+            if isinstance(phoneInfo, str):
+                return phoneInfo
+            else:
+                self.smtp = SMTPctrl()
+                self.resetCode = self.smtp.sendSMS(phoneInfo[0], self.currUser, phoneInfo[1])
+                return true
+        else:    
+            email = self.handler.getEmail(user)
+            if str(email).find('@') < 0:
+                return email
+            else:
+                self.smtp = SMTPctrl()
+                self.resetCode = self.smtp.sendMail(email, self.currUser)
+                return true
+            
+    def startPassReset(self, user, byway, erro):
+        if len(user) < 4:
+            erro.set("Invalid Username")
+        else:
+            self.currUser = user
+            rtn = self.getNewCode(user, byway)
+            if isinstance(rtn, bool):
+                self.resetWindow.destroy()
+                self.resetWindow=None
+                self.secresetWindow = self.Secreset()
+            else:
+                erro.set(rtn)
 
     def resetPass(self, newpass, erro, code=None):
         if code == None:
@@ -184,7 +208,7 @@ class VaultApp():
 
         # Login Window layout
         self.loginWindow.title('THE VAULT')
-        self.loginWindow.geometry("500x225+300+200")
+        self.loginWindow.geometry("650x300+400+300")
         self.loginWindow.configure(bg=bgColorMain)
 
         # Frames for Login window
@@ -217,22 +241,26 @@ class VaultApp():
 
         # User and password entry boxes
         large_font = ('times',16)
-        accountNameEntry = Entry(entryFrame, font=large_font, bd=4, bg=bgColorSub, fg="#FFFFFF")
+        nameText = tkinter.StringVar()
+        nameText.set("")
+        accountNameEntry = Entry(entryFrame, textvariable=nameText, font=large_font, bd=4, bg=bgColorSub, fg="#FFFFFF")
         accountNameEntry.pack(side=TOP, fill=BOTH, pady=5)
         accountNameEntry.configure(highlightbackground=bgColorSub)
-        masterPasswordEntry = Entry(entryFrame, font=large_font, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
+        passText = tkinter.StringVar()
+        passText.set("")
+        masterPasswordEntry = Entry(entryFrame, textvariable=passText, font=large_font, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
         masterPasswordEntry.pack(side=BOTTOM, fill=BOTH, pady=5)
         masterPasswordEntry.configure(highlightbackground= bgColorSub)
 
         # Login button
         large_font = ('times',16)
-        loginButton = tkinter.Button(buttonFrame, text="Login", font=large_font, bg=bgColorSub, height=1, width=6,
-                      command=lambda: self.login(accountNameEntry.get(),masterPasswordEntry.get(), self.loginError))
+        loginButton = tkinter.Button(buttonFrame, text="Login", font=large_font, height=1, width=6,
+                      command=lambda: self.login(nameText,passText, self.loginError))
         loginButton.pack(side=LEFT, expand=YES, pady=5, padx=5)
         loginButton.configure(relief=RAISED)
 
         # Register button
-        registerButton = tkinter.Button(buttonFrame, text="Register", font=large_font, bg=bgColorSub, height=1, width=8,
+        registerButton = tkinter.Button(buttonFrame, text="Register", font=large_font, height=1, width=8,
                       command= lambda: self.openWindow("register"))
         registerButton.pack(side=RIGHT, expand=YES, pady=5, padx=5)
         registerButton.configure(relief=RAISED)
@@ -247,13 +275,17 @@ class VaultApp():
         self.loginWindow.mainloop()
 
     def Welcome(self, msg=""):
-        bgColorMain = "#856ff8"
+        bgColorMain = "#dfbb3b"
         bgColorSub = "#765EEF"
+
+        imgDat = Image.open("vault.jpg")
+        img = ImageTk.PhotoImage(imgDat)
+
 
         # Welcome window layout
         self.welcomeWindow = Toplevel()
         self.welcomeWindow.title('WELCOME')
-        self.welcomeWindow.geometry("700x300+300+150")
+        self.welcomeWindow.geometry("1000x600+300+150")
 
         # Menu bar
         menu_bar = Menu(self.welcomeWindow)
@@ -281,49 +313,49 @@ class VaultApp():
         # Window frames
         mainFrame = Frame(self.welcomeWindow, bg=bgColorMain)
         mainFrame.pack(fill="none", expand=True)
+        errorFrame = Frame(mainFrame, bg=bgColorMain)
+        errorFrame.pack(side=TOP, fill="none", expand=False, pady=10)
+        buttonFrame = Frame(mainFrame, bg=bgColorMain)
+        buttonFrame.pack(side=TOP, fill="none", expand=True, pady=10)
         upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False)
-        errorFrame = Frame(upperFrame, bg=bgColorMain)
-        errorFrame.pack(side=TOP, fill="none", expand=False)
-        labelFrame = Frame(upperFrame, bg=bgColorMain, pady=30)
+        labelFrame = Frame(upperFrame, bg=bgColorMain)
         labelFrame.pack(side=TOP, fill="none", expand=False)
-        buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=15)
-        buttonFrame.pack(fill="none", expand=True)
 
         # Labels
-        times = tkFont.Font(family="TimesNewRoman", size=40)
-        welcomeLabel = Label(labelFrame, text="WELCOME TO THE VAULT", bg=bgColorMain, fg="#008080", font=times)
+        times = tkFont.Font(family="TimesNewRoman", size=40, weight='bold')
+        welcomeLabel = Label(mainFrame, image=img)
         welcomeLabel.pack(side=TOP, fill=BOTH)
-        err = tkFont.Font(family="TimesNewRoman", size=20)
+        err = tkFont.Font(family="TimesNewRoman", size=30)
         errorText = tkinter.StringVar()
         errorText.set(msg)
-        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#333333", font=err)
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
 
         # Retrieve button
         large_font = ('times',18)
         retrieveButton = Button(buttonFrame, text="Retrieve", font=large_font, height="2", width="10", command=lambda: self.openWindow("retrieve"))
         retrieveButton.pack(side=LEFT, padx=10)
-        retrieveButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
+        retrieveButton.configure(relief=RAISED, state=NORMAL)
 
         # Store button
         large_font = ('times',18)
         storeButton = Button(buttonFrame, text="Store", font=large_font, height="2", width="10", command=lambda: self.openWindow("store"))
         storeButton.pack(side=RIGHT, padx=10)
-        storeButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
+        storeButton.configure(relief=RAISED, state=NORMAL)
 
         # Closes window using x button
         self.welcomeWindow.protocol("WM_DELETE_WINDOW", self.cascadeDestroy)
         self.welcomeWindow.mainloop()
 
     def Register(self):
-        bgColorMain = "#009900"
-        bgColorSub = "#259C44"
+        bgColorMain = "#00BF00"
+        bgColorSub = "#009E00"
 
         # Register window layout
         self.registerWindow = Toplevel()
         self.registerWindow.title('REGISTER')
-        self.registerWindow.geometry("600x500+300+150")
+        self.registerWindow.geometry("550x450+400+200")
 
         # Menu bar
         menu_bar = Menu(self.registerWindow)
@@ -348,9 +380,9 @@ class VaultApp():
         upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False, pady=20)
         labelFrame = Frame(upperFrame, bg=bgColorMain)
-        labelFrame.pack(side=LEFT, fill="none", expand=False, padx=5)
+        labelFrame.pack(side=LEFT, fill="none", expand=False, padx=20)
         entryFrame = Frame(upperFrame, bg=bgColorMain)
-        entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=5)
+        entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=15)
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=20)
         buttonFrame.pack(side=BOTTOM, fill="none", expand=False)
 
@@ -360,36 +392,39 @@ class VaultApp():
         errorText.set("")
         errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+
+        labelpad = 9
         times = tkFont.Font(family="TimesNewRoman", size=18)
         userNameLabel = Label(labelFrame, text="User Name:", bg=bgColorMain, font=times)
-        userNameLabel.pack(side=TOP, fill=BOTH, pady=10)
+        userNameLabel.pack(side=TOP, fill=BOTH, pady=labelpad)
         PasswordLabel = Label(labelFrame, text="Password:", bg=bgColorMain, font=times)
-        PasswordLabel.pack(side=TOP, fill=BOTH, pady=10)
+        PasswordLabel.pack(side=TOP, fill=BOTH, pady=labelpad)
         emailLabel = Label(labelFrame, text="Email Address:", bg=bgColorMain, font=times)
-        emailLabel.pack(side=TOP, fill=BOTH, pady=10)
+        emailLabel.pack(side=TOP, fill=BOTH, pady=labelpad)
         phoneLabel = Label(labelFrame, text="Phone Number:", bg=bgColorMain, font=times)
-        phoneLabel.pack(side=TOP, fill=BOTH, pady=10)
+        phoneLabel.pack(side=TOP, fill=BOTH, pady=labelpad)
         providerLabel = Label(labelFrame, text="Provider:", bg=bgColorMain, font=times)
-        providerLabel.pack(side=TOP, fill=BOTH, pady=10)
+        providerLabel.pack(side=TOP, fill=BOTH, pady=labelpad)
 
+        entrypad = 13
         # User information entry boxes
-        userNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        userNameEntry.pack(side=TOP, fill=BOTH, pady=10)
+        userNameEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF", width=30)
+        userNameEntry.pack(side=TOP, fill=BOTH, pady=entrypad)
         userNameEntry.configure(highlightbackground=bgColorSub)
-        passwordEntry = Entry(entryFrame, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF")
-        passwordEntry.pack(side=TOP, fill=BOTH, pady=10)
+        passwordEntry = Entry(entryFrame, bd=4, bg=bgColorSub, show='*', fg="#FFFFFF", width=30)
+        passwordEntry.pack(side=TOP, fill=BOTH, pady=entrypad)
         passwordEntry.configure(highlightbackground= bgColorSub)
-        emailEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        emailEntry.pack(side=TOP, fill=BOTH, pady=10)
+        emailEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF", width=30)
+        emailEntry.pack(side=TOP, fill=BOTH, pady=entrypad)
         emailEntry.configure(highlightbackground=bgColorSub)
-        phoneEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF")
-        phoneEntry.pack(side=TOP, fill=BOTH, pady=10)
+        phoneEntry = Entry(entryFrame, bd=4, bg=bgColorSub, fg="#FFFFFF", width=30)
+        phoneEntry.pack(side=TOP, fill=BOTH, pady=entrypad)
         phoneEntry.configure(highlightbackground=bgColorSub)
 
         providerText = tkinter.StringVar()
         providerText.set("Select Phone Provider")
         providerEntry = Menubutton(entryFrame, textvariable=providerText, relief=FLAT)
-        providerEntry.pack(side=TOP, fill=BOTH, pady=10)
+        providerEntry.pack(side=TOP, fill=BOTH, pady=entrypad)
         providerEntry.menu = Menu(providerEntry, tearoff=0)
         providerEntry["menu"] = providerEntry.menu
         providerEntry.menu.add_checkbutton(label="AT&T", variable=IntVar(), command= lambda: providerText.set("AT&T"))
@@ -405,12 +440,12 @@ class VaultApp():
         registerButton = Button(buttonFrame, text="Register", height="2", width="10",
             command=lambda: self.reg(userNameEntry.get(),passwordEntry.get(),emailEntry.get(),phoneEntry.get(),providerText.get(),errorText))
         registerButton.pack(side=RIGHT, padx=10)
-        registerButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
+        registerButton.configure(relief=RAISED, state=NORMAL)
 
         # Cancel button
         cancelButton = Button(buttonFrame, text="Cancel", height="2", width="10", command=lambda: self.closeWindow("register"))
         cancelButton.pack(side=LEFT, padx=10)
-        cancelButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
+        cancelButton.configure(relief=RAISED, state=NORMAL)
 
         # Closes window using x button
         self.registerWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("register"))
@@ -441,6 +476,8 @@ class VaultApp():
         # Window frames
         mainFrame = Frame(self.resetWindow, bg=bgColorMain)
         mainFrame.pack(fill="none", expand=True)
+        errorFrame = Frame(mainFrame, bg=bgColorMain)
+        errorFrame.pack(side=TOP, fill="none", expand=False, pady=10)
         upperFrame = Frame(mainFrame, bg=bgColorMain)
         upperFrame.pack(side=TOP, fill="none", expand=False, pady=10)
         labelFrame = Frame(upperFrame, bg=bgColorMain)
@@ -449,6 +486,12 @@ class VaultApp():
         entryFrame.pack(side=RIGHT)
         buttonFrame = Frame(mainFrame, bg=bgColorMain, pady=5)
         buttonFrame.pack(side=BOTTOM, fill="none", expand=False, pady=5)
+
+        err = tkFont.Font(family="TimesNewRoman", size=18)
+        errorText = tkinter.StringVar()
+        errorText.set("")
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#333333", font=err )
+        errorLabel.pack(side=TOP, fill=BOTH, pady=10)
 
         # Label for entry box
         times = tkFont.Font(family="TimesNewRoman", size=18)
@@ -462,14 +505,20 @@ class VaultApp():
         accountNameEntry.configure(highlightbackground=bgColorMain)
 
         # Enter button
-        enterButton = tkinter.Button(buttonFrame, text="Get Reset Code", height="2", width="14", command=lambda: self.startPassReset(accountNameEntry.get()))
-        enterButton.pack(side=RIGHT, expand=YES, pady=5, padx=5)
-        enterButton.configure(bg=bgColorSub)
+        emailButton = tkinter.Button(buttonFrame, text="Reset via Email", height="2", width="14", 
+            command=lambda: self.startPassReset(accountNameEntry.get(),'email', errorText))
+        emailButton.pack(side=RIGHT, expand=YES, pady=5, padx=5)
+
+
+        phoneButton = tkinter.Button(buttonFrame, text="Reset via SMS", height="2", width="14", 
+            command=lambda: self.startPassReset(accountNameEntry.get(),'phone', errorText))
+        phoneButton.pack(side=RIGHT, expand=YES, pady=5, padx=5)
+
 
         # Cancel button
-        cancelButton = Button(buttonFrame, text="Cancel", height="2", width="8", command=lambda: self.closeWindow("reset"))
+        cancelButton = Button(buttonFrame, text="Cancel", height="2", width="8", 
+            command=lambda: self.closeWindow("reset"))
         cancelButton.pack(side=LEFT, pady=5, padx=5)
-        cancelButton.configure(bg=bgColorSub, relief=RAISED, state=NORMAL)
 
         # Closes window using x button
         self.resetWindow.protocol("WM_DELETE_WINDOW", self.resetCascadeDestroy)
@@ -482,7 +531,7 @@ class VaultApp():
         # Reset Window layout
         self.secresetWindow = Toplevel()
         self.secresetWindow.title('RESET')
-        self.secresetWindow.geometry("400x300")
+        self.secresetWindow.geometry("500x350")
 
         # Menu bar
         menu_bar = Menu(self.secresetWindow)
@@ -517,7 +566,7 @@ class VaultApp():
         err = tkFont.Font(family="TimesNewRoman", size=18)
         errorText = tkinter.StringVar()
         errorText.set("")
-        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err )
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#333333", font=err )
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
         times = tkFont.Font(family="TimesNewRoman", size=16)
         codeLabel = Label(labelFrame, text="Enter Reset Code:", font=times, bg=bgColorMain)
@@ -526,21 +575,20 @@ class VaultApp():
         newpassLabel.pack(side=TOP, fill=BOTH, pady=5)
 
         # Account name entry box
-        codeEntry = Entry(boxFrame, bd=5, bg=bgColorMain)
+        codeEntry = Entry(boxFrame, bd=5, bg=bgColorMain, width=30)
         codeEntry.pack(side=TOP, fill=BOTH, pady=5)
         codeEntry.configure(highlightbackground=bgColorMain)
-        newpassEntry = Entry(boxFrame, bd=5, bg=bgColorMain)
+        newpassEntry = Entry(boxFrame, bd=5, bg=bgColorMain, width=30)
         newpassEntry.pack(side=TOP, fill=BOTH, pady=5)
         newpassEntry.configure(highlightbackground=bgColorMain)
 
-        ## TODO Add functions to buttons
         # Enter button
         getnewButton = tkinter.Button(lowerFrame, text="Get New Code", height="2", width="15", command=lambda: self.getNewCode(self.user))
         getnewButton.pack(side=LEFT, expand=YES, pady=5)
-        getnewButton.configure(bg=bgColorSub)
+
         resetButton = tkinter.Button(lowerFrame, text="Reset Password", height="2", width="15", command=lambda: self.resetPass(newpassEntry.get(),errorText,codeEntry.get()))
         resetButton.pack(side=RIGHT, expand=YES, pady=5)
-        resetButton.configure(bg=bgColorSub)
+
 
         # Closes window using x button
         self.secresetWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("secreset"))
@@ -602,19 +650,19 @@ class VaultApp():
         passwordEntry.configure(highlightbackground= bgColorSub)
 
          # Cancel button
-        cancelbutton = Button(buttonFrame, text="Cancel", bg=bgColorSub, height="2", width="10",
+        cancelbutton = Button(buttonFrame, text="Cancel", height="2", width="10",
             command=lambda: self.closeWindow("store"))
         cancelbutton.configure(state=NORMAL)
         cancelbutton.pack(side=LEFT, padx=10)
 
          # Clear button
-        clearbutton = Button(buttonFrame, text="Clear", bg=bgColorSub, height="2", width="10",
+        clearbutton = Button(buttonFrame, text="Clear", height="2", width="10",
             command=lambda: self.clearStore(nickNameText,userNameText,passwordText,errorText))
         clearbutton.configure(state=NORMAL)
         clearbutton.pack(side=LEFT, padx=10)
 
         # Store button
-        storebutton = Button(buttonFrame, text="Store", bg=bgColorSub, height="2", width="10",
+        storebutton = Button(buttonFrame, text="Store", height="2", width="10",
             command=lambda: self.storeRec(nickNameText,userNameText,passwordText, errorText))
         storebutton.configure(state=NORMAL)
         storebutton.pack(side=RIGHT, padx=10)
@@ -673,19 +721,19 @@ class VaultApp():
         recordEntry.config(yscrollcommand=recordScroll.set)
 
         # Cancel button
-        cancelbutton = Button(buttonFrame, text="Cancel", bg=bgColorSub, height="2", width="10",
+        cancelbutton = Button(buttonFrame, text="Cancel", height="2", width="10",
             command=lambda: self.closeWindow("retrieve"))
         cancelbutton.configure(state=NORMAL)
         cancelbutton.pack(side=LEFT, padx=10)
 
         # Clear button
-        clearbutton = Button(buttonFrame, text="Clear", bg=bgColorSub, height="2", width="10",
+        clearbutton = Button(buttonFrame, text="Clear", height="2", width="10",
             command=lambda: self.clearRet(nickNameText, recordEntry, errorText))
         clearbutton.configure(state=NORMAL)
         clearbutton.pack(side=LEFT, padx=10)
 
         # Retrieve button
-        retrieveButton = Button(buttonFrame, text="Retrieve", bg=bgColorSub, height="2", width="10",
+        retrieveButton = Button(buttonFrame, text="Retrieve", height="2", width="10",
             command=lambda: self.returnRet(nickNameText.get(),recordEntry,errorText))
         retrieveButton.pack(side=LEFT, padx=10)
         retrieveButton.configure(state=NORMAL)
@@ -694,13 +742,16 @@ class VaultApp():
         self.retrieveWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("retrieve"))
         self.retrieveWindow.mainloop()
 
+
     def Settings(self):
         bgColorMain = "#B3DD88"
         bgColorSub = "#B3D98C"
 
         self.settingsWindow = Toplevel()
         self.settingsWindow.title('Settings')
-        self.settingsWindow.geometry("700x650+400+150")
+        self.settingsWindow.geometry("580x550+400+200")
+        padd = 5
+        framewidth = 50
 
         # Menu bar in settings window
         menu_bar = Menu(self.settingsWindow)
@@ -717,54 +768,70 @@ class VaultApp():
         # Frames
         mainFrame = Frame(self.settingsWindow, bg=bgColorMain)
         mainFrame.pack(fill=BOTH, expand=True)
-        upperFrame = Frame(mainFrame, bg=bgColorMain)
-        upperFrame.pack(side=TOP, fill="none", expand=False)
-        bottomFrame = Frame(mainFrame, bg=bgColorMain)
-        bottomFrame.pack(side=TOP, fill="none", expand=False)
-        labelFrame = Frame(bottomFrame, bg=bgColorMain)
-        labelFrame.pack(side=LEFT, fill="none", expand=False)
-        entryFrame = Frame(bottomFrame, bg=bgColorMain)
-        entryFrame.pack(side=RIGHT, fill="none", expand=False, padx=5, pady=15)
-        passwordFrame = Frame(entryFrame, bg=bgColorMain)
-        passwordFrame.pack(side=TOP, fill="none", expand=False, pady=20)
-        emailFrame = Frame(entryFrame, bg=bgColorMain)
-        emailFrame.pack(side=TOP, fill="none", expand=False, pady=25)
-        phoneFrame = Frame(entryFrame, bg=bgColorMain)
-        phoneFrame.pack(side=TOP, fill="none", expand=False, pady=25)
-        providerFrame = Frame(entryFrame, bg=bgColorMain)
-        providerFrame.pack(side=TOP, fill="none", expand=False, pady=20)
+        errorFrame = Frame(mainFrame, bg=bgColorMain)
+        errorFrame.pack(side=TOP, fill="none", expand=False)
 
+        passFrame = LabelFrame(mainFrame, text="Change Master Password", bg=bgColorMain)
+        passFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        passbuttonFrame = Frame(passFrame, bg=bgColorMain)
+        passbuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
+
+        emailFrame = LabelFrame(mainFrame,text="Change Email", bg=bgColorMain)
+        emailFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        mailbuttonFrame = Frame(emailFrame, bg=bgColorMain)
+        mailbuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
+
+        phoneFrame = LabelFrame(mainFrame,text="Change Phone Info", bg=bgColorMain)
+        phoneFrame.pack(side=TOP, fill=BOTH, expand=True, ipady=15, ipadx=5, pady=5)
+        phonebuttonFrame = Frame(phoneFrame, bg=bgColorMain)
+        phonebuttonFrame.pack(side=BOTTOM, fill="none", expand=True)
+        
         # Labels
         err = tkFont.Font(family="TimesNewRoman", size=18)
         errorText = tkinter.StringVar()
         errorText.set("")
-        errorLabel = Label(upperFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
+        errorLabel = Label(errorFrame, textvariable=errorText, bg=bgColorMain, fg="#E8E8E8", font=err)
         errorLabel.pack(side=TOP, fill=BOTH, pady=10)
+
         times = tkFont.Font(family="TimesNewRoman", size=18)
-        masterPasswordLabel = Label(labelFrame, text="Enter new Master Password:", bg=bgColorMain, font=times)
-        masterPasswordLabel.pack(side=TOP, fill=BOTH, pady=40)
-        newEmailLabel = Label(labelFrame, text="Enter new email:", bg=bgColorMain, font=times)
-        newEmailLabel.pack(side=TOP, fill=BOTH, pady=40)
-        phoneNumberLabel = Label(labelFrame, text="Enter new phone number:", bg=bgColorMain, font=times)
-        phoneNumberLabel.pack(side=TOP, fill=BOTH, pady=40)
-        newProviderLabel = Label(labelFrame, text="Enter new provider:", bg=bgColorMain, font=times)
-        newProviderLabel.pack(side=TOP, fill=BOTH, pady=40)
+
+        masterPasswordLabel = Label(passFrame, text="Enter new Master Password:", bg=bgColorMain, font=times)
+        masterPasswordLabel.pack(side=LEFT, fill="none", expand=True, pady=padd)
+
+        newEmailLabel = Label(emailFrame, text="Enter new email:", bg=bgColorMain, font=times)
+        newEmailLabel.pack(side=LEFT, fill="none", expand=True, pady=padd)
+
+        phoneLabelFrame = Frame(phoneFrame, bg=bgColorMain)
+        phoneLabelFrame.pack(side=LEFT, fill=BOTH, expand=True)
+        phoneNumberLabel = Label(phoneLabelFrame, text="Enter new phone number:", bg=bgColorMain, font=times)
+        phoneNumberLabel.pack(side=TOP, fill="none", pady=padd)
+        newProviderLabel = Label(phoneLabelFrame, text="Enter new provider:", bg=bgColorMain, font=times)
+        newProviderLabel.pack(side=TOP, fill="none", pady=padd)
 
         # Entry boxes
-        masterPasswordEntry = Entry(passwordFrame, bd=5, show='*', bg=bgColorSub)
+        mPassText = tkinter.StringVar()
+        mPassText.set("")
+        masterPasswordEntry = Entry(passFrame, bd=5, show='*', bg=bgColorSub, textvariable=mPassText, fg="#000000")
         masterPasswordEntry.configure(highlightbackground=bgColorSub)
-        masterPasswordEntry.pack(side=TOP, fill=BOTH, pady=5)
-        newEmailEntry = Entry(emailFrame, bd=5, bg=bgColorSub, fg=bgColorSub)
-        newEmailEntry.configure(highlightbackground=bgColorSub)
-        newEmailEntry.pack(side=TOP, fill=BOTH, pady=5)
-        phoneNumberEntry = Entry(phoneFrame, bd=5, bg=bgColorSub, fg=bgColorSub)
-        phoneNumberEntry.configure(highlightbackground=bgColorSub)
-        phoneNumberEntry.pack(side=TOP, fill=BOTH, pady=5)
+        masterPasswordEntry.pack(side=RIGHT, fill="none", expand=True, pady=padd)
 
+        mailText = tkinter.StringVar()
+        mailText.set("")
+        newEmailEntry = Entry(emailFrame, bd=5, bg=bgColorSub, textvariable=mailText,fg="#000000")
+        newEmailEntry.configure(highlightbackground=bgColorSub)
+        newEmailEntry.pack(side=RIGHT, fill="none", expand=True, pady=padd)
+
+        numText = tkinter.StringVar()
+        numText.set("")
+        phoneEntryFrame = Frame(phoneFrame, bg=bgColorMain)
+        phoneEntryFrame.pack(side=RIGHT, fill="none", expand=True)
+        phoneNumberEntry = Entry(phoneEntryFrame, bd=5, bg=bgColorSub, textvariable=numText,fg="#000000")
+        phoneNumberEntry.configure(highlightbackground=bgColorSub)
+        phoneNumberEntry.pack(side=TOP, fill="none", expand=True, pady=padd)
         providerText = tkinter.StringVar()
         providerText.set("Select Phone Provider")
-        providerEntry = Menubutton(providerFrame, textvariable=providerText, relief=FLAT)
-        providerEntry.pack(side=TOP, fill=BOTH, pady=5)
+        providerEntry = Menubutton(phoneEntryFrame, textvariable=providerText, relief=FLAT)
+        providerEntry.pack(side=TOP, fill="none", expand=True, pady=padd)
         providerEntry.menu = Menu(providerEntry, tearoff=0)
         providerEntry["menu"] = providerEntry.menu
         providerEntry.menu.add_checkbutton(label="AT&T", variable=IntVar(), command= lambda: providerText.set("AT&T"))
@@ -776,19 +843,46 @@ class VaultApp():
         providerEntry.menu.add_checkbutton(label="MetroPCS", variable=IntVar(), command= lambda: providerText.set("MetroPCS"))
         providerEntry.menu.add_checkbutton(label="Virgin Mobile", variable=IntVar(), command= lambda: providerText.set("Virgin Mobile"))
 
+        def changePass(npass, erro):  
+            rtn = self.handler.resetPass(self.currUser, npass.get())
+            if rtn:
+                erro.set("Password Reset!")
+            else:
+                erro.set(rnt)
+            npass.set("")
+
+        def changeEmail(mail, erro):
+            rtn = self.handler.resetEmail(mail.get())
+            if rtn:
+                erro.set("Email Reset!")
+            else:
+                erro.set(rnt)
+            mail.set("")
+        
+        def changePhone(num, prov, erro):
+            rtn = self.handler.resetPhone(num.get(), prov.get())
+            if rtn:
+                erro.set("Phone Information Reset!")
+            else:
+                erro.set(rnt)
+            num.set("")
+            prov.set("Select Phone Provider")
+
         # Change buttons
-        changePasswordButton = tkinter.Button(passwordFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changePasswordButton = tkinter.Button(passbuttonFrame, text="Change Password", height="1", width="15",
+            command=lambda: changePass(mPassText,errorText))
         changePasswordButton.configure(relief=RAISED, state=NORMAL)
-        changePasswordButton.pack(side=BOTTOM, expand=YES, pady=5)
-        changeEmailButton = tkinter.Button(emailFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changePasswordButton.pack(side=TOP, pady=padd)
+
+        changeEmailButton = tkinter.Button(mailbuttonFrame, text="Change Email", height="1", width="15",
+            command=lambda: changeEmail(mailText,errorText))
         changeEmailButton.configure(relief=RAISED, state=NORMAL)
-        changeEmailButton.pack(side=BOTTOM, expand=YES, pady=5)
-        changePhoneButton = tkinter.Button(phoneFrame, text="Change", bg=bgColorSub, height="1", width="8")
+        changeEmailButton.pack(side=TOP, pady=padd)
+
+        changePhoneButton = tkinter.Button(phonebuttonFrame, text="Change Phone Info", height="1", width="15",
+            command=lambda: changePhone(numText,providerText,errorText))
         changePhoneButton.configure(relief=RAISED, state=NORMAL)
-        changePhoneButton.pack(side=BOTTOM, expand=YES, pady=5)
-        changeProviderButton = tkinter.Button(providerFrame, text="Change", bg=bgColorSub, height="1", width="8")
-        changeProviderButton.configure(relief=RAISED, state=NORMAL)
-        changeProviderButton.pack(side=TOP, expand=YES, pady=5)
+        changePhoneButton.pack(side=TOP, pady=padd)
 
         # Closes window using x button
         self.settingsWindow.protocol("WM_DELETE_WINDOW", lambda: self.closeWindow("settings"))
