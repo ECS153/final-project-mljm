@@ -123,7 +123,7 @@ class VaultApp():
             else:
                 self.smtp = SMTPctrl()
                 self.resetCode = self.smtp.sendSMS(phoneInfo[0], self.currUser, phoneInfo[1])
-                return true
+                return True
         else:    
             email = self.handler.getEmail(user)
             if str(email).find('@') < 0:
@@ -131,7 +131,7 @@ class VaultApp():
             else:
                 self.smtp = SMTPctrl()
                 self.resetCode = self.smtp.sendMail(email, self.currUser)
-                return true
+                return True
             
     def startPassReset(self, user, byway, erro):
         if len(user) < 4:
