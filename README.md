@@ -1,10 +1,21 @@
 # ECS 153 Final Project: The Vault
-A password Manager
+A desktop password manager that stores passwords safely.
 
 + Project proposal: https://github.com/ECS153/final-project-mljm/blob/master/proposal.md
 + Milestone1: https://github.com/ECS153/final-project-mljm/blob/master/Milestone1.md
 + Milestone2: https://github.com/ECS153/final-project-mljm/blob/master/Milestone2.md
 + Milestone3: https://github.com/ECS153/final-project-mljm/blob/master/Milestone3.md
+
+### Code Structure in sourcecode
+-------------------------------------
+|- GUI.py: Implement a **graphical Interface** for users to use the application.
+
+|- handler.py: Handle the interaction between the **User Interface** and the **Database**.
+|---- smtpCtrl.py: Provide SMTP service for the handler to send emails.
+
+|- db.py: Maintain a **Database** and corresponding operations, including storing, retrieving and resetting.
+|---- crypt.py: Provide encryption and decryption function for database operations.
+-------------------------------------
 
 ### Installs needed for The Vault
 + Crypto: For encryption
