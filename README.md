@@ -11,10 +11,10 @@ A desktop password manager that stores passwords safely.
 |- **GUI.py**: Implement a graphical Interface for users to use the application.
 
 |- **handler.py**: Handle the interaction between the User Interface and the Database.
-|---- **smtpCtrl.py**: Provide SMTP service for the handler to send emails.
+|--- **smtpCtrl.py**: Provide SMTP service for the handler to send emails.
 
 |- **db.py**: Maintain a Database and corresponding operations, including storing, retrieving and resetting.
-|---- **crypt.py**: Provide encryption and decryption function for database operations.
+|--- **crypt.py**: Provide encryption and decryption function for database operations.
 
 
 ## Installs needed for The Vault
