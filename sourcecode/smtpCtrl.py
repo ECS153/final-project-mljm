@@ -5,7 +5,7 @@ class SMTPctrl():
     
     def __init__(self):
         self.account = "thevault.mljm@gmail.com"
-        self.mpass = "%67w2^*sF#kdK1jY@WZAxIJihWMbBiCM6MNOX4by"
+        self.mpass = "mwshaewpwtaoapco"
     
     def sendMail(self, recip, user):
         resetCode = secrets.token_urlsafe(15)
